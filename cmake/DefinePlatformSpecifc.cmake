@@ -81,7 +81,7 @@ else (CYGWIN)
 	if (UNIX AND NOT ANDROID )
 	  # Standard 'must be' defines
 	  if (APPLE)
-	    add_definitions( -DPOCO_HAVE_IPv6 -DPOCO_NO_STAT64)
+	    add_definitions( -DPOCO_HAVE_IPv6 -DPOCO_NO_STAT64 -DPOCO_HAVE_FD_POLL )
 	    set(SYSLIBS  dl)
 	  else (APPLE)
 	    add_definitions( -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 )
