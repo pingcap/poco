@@ -377,6 +377,8 @@ long SecureSocketImpl::verifyPeerCertificateImpl(const std::string& hostName)
 	if (pCert)
 	{
 		X509Certificate cert(pCert);
+		if (_pContext->useAdhocVerification())
+			return _pContext->adhocVerificate(cert);
 		return cert.verify(hostName) ? X509_V_OK : X509_V_ERR_APPLICATION_VERIFICATION;
 	}
 	else return X509_V_OK;
