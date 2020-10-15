@@ -25,11 +25,13 @@ DigestEngine::DigestEngine(const std::string& name):
 	_pContext(EVP_MD_CTX_create())
 {
 	const EVP_MD* md = EVP_get_digestbyname(_name.c_str());
-	if (!md) throw OpenSSLException(_name);
-	EVP_DigestInit_ex(_pContext, md, NULL);	
+	// if (!md) throw OpenSSLException(_name);
+	// EVP_DigestInit_ex(_pContext, md, NULL);	
+	if (!md) throw Poco::NotFoundException(_name);
+	EVP_DigestInit_ex(_pContext, md, NULL);
 }
 
-	
+
 DigestEngine::~DigestEngine()
 {
 	EVP_MD_CTX_destroy(_pContext);
@@ -37,7 +39,7 @@ DigestEngine::~DigestEngine()
 
 int DigestEngine::nid() const
 {
-	return EVP_MD_nid(EVP_MD_CTX_md(_pContext));
+	return EVP_MD_type(EVP_MD_CTX_md(_pContext));
 }
 
 std::size_t DigestEngine::digestLength() const
