@@ -52,7 +52,7 @@ target_include_directories( "${LIBNAME}"
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
-
+target_compile_options("${LIBNAME}" PRIVATE "-Wno-return-local-addr")
 POCO_INSTALL("${LIBNAME}")
 POCO_GENERATE_PACKAGE("${LIBNAME}")
 

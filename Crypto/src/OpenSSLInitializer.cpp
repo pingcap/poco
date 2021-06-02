@@ -62,8 +62,10 @@ void OpenSSLInitializer::initialize()
 	FastMutex::ScopedLock lock(_mutex);
 	if (++_rc == 1)
 	{
-#if OPENSSL_VERSION_NUMBER >= 0x0907000L
-		OPENSSL_config(NULL);
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+        CONF_modules_load(NULL, NULL, 0);
+#elif OPENSSL_VERSION_NUMBER >= 0x0907000L
+        OPENSSL_config(NULL);
 #endif
 		if(! _disableSSLInitialization)
 		{

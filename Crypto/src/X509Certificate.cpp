@@ -28,6 +28,11 @@
 #include <openssl/err.h>
 #include <openssl/evp.h>
 
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+#define ASN1_STRING_get0_data ASN1_STRING_data
+#define X509_get0_notBefore X509_get_notBefore
+#define X509_get0_notAfter X509_get_notAfter
+#endif
 
 namespace Poco {
 namespace Crypto {
@@ -247,27 +252,27 @@ std::string X509Certificate::subjectName(NID nid) const
 
 void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& domainNames) const
 {
-	domainNames.clear();
-	if (STACK_OF(GENERAL_NAME)* names = static_cast<STACK_OF(GENERAL_NAME)*>(X509_get_ext_d2i(_pCert, NID_subject_alt_name, 0, 0)))
-	{
-		for (int i = 0; i < sk_GENERAL_NAME_num(names); ++i)
-		{
-			const GENERAL_NAME* name = sk_GENERAL_NAME_value(names, i);
-			if (name->type == GEN_DNS)
-			{
-				const char* data = reinterpret_cast<char*>(ASN1_STRING_data(name->d.ia5));
-				std::size_t len = ASN1_STRING_length(name->d.ia5);
-				domainNames.insert(std::string(data, len));
-			}
-		}
-		GENERAL_NAMES_free(names);
-	}
+    domainNames.clear();
+    if (STACK_OF(GENERAL_NAME)* names = static_cast<STACK_OF(GENERAL_NAME)*>(X509_get_ext_d2i(_pCert, NID_subject_alt_name, 0, 0)))
+    {
+        for (int i = 0; i < sk_GENERAL_NAME_num(names); ++i)
+        {
+            const GENERAL_NAME* name = sk_GENERAL_NAME_value(names, i);
+            if (name->type == GEN_DNS)
+            {
+                const char* data = reinterpret_cast<const char*>(ASN1_STRING_get0_data(name->d.ia5));
+                std::size_t len = ASN1_STRING_length(name->d.ia5);
+                domainNames.insert(std::string(data, len));
+            }
+        }
+        GENERAL_NAMES_free(names);
+    }
 
-	cmnName = commonName();
-	if (!cmnName.empty() && domainNames.empty())
-	{
-		domainNames.insert(cmnName);
-	}
+    cmnName = commonName();
+    if (!cmnName.empty() && domainNames.empty())
+    {
+        domainNames.insert(cmnName);
+    }
 }
 
 
@@ -391,8 +396,8 @@ void X509Certificate::printAll(std::ostream& out) const
 	{
 		X509_NAME_ENTRY* e = X509_NAME_get_entry(subj, i);
 		ASN1_STRING* d = X509_NAME_ENTRY_get_data(e);
-		unsigned char* str = ASN1_STRING_data(d);
-		out << (char*) str << std::endl;
+		const unsigned char* str = ASN1_STRING_get0_data(d);
+		out << (const char*) str << std::endl;
 	}
 }
 
