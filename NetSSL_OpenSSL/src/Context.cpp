@@ -357,13 +357,13 @@ void Context::preferServerCiphers()
 
 void Context::createSSLContext()
 {
-    int minTLSVersion = 0;
+	int minTLSVersion = 0;
 	if (SSLManager::isFIPSEnabled())
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-        _pSSLContext = SSL_CTX_new(TLS_method());
+		_pSSLContext = SSL_CTX_new(TLS_method());
 #else
-        _pSSLContext = SSL_CTX_new(TLSv1_method());
+		_pSSLContext = SSL_CTX_new(TLSv1_method());
 #endif
 	}
 	else
@@ -387,18 +387,18 @@ void Context::createSSLContext()
 #if defined(SSL_OP_NO_TLSv1) && !defined(OPENSSL_NO_TLS1)
 		case TLSV1_CLIENT_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-                _pSSLContext = SSL_CTX_new(TLS_client_method());
-                minTLSVersion = TLS1_VERSION;
+				_pSSLContext = SSL_CTX_new(TLS_client_method());
+				minTLSVersion = TLS1_VERSION;
 #else
-                _pSSLContext = SSL_CTX_new(TLSv1_client_method());
+				_pSSLContext = SSL_CTX_new(TLSv1_client_method());
 #endif
 			break;
 		case TLSV1_SERVER_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-                _pSSLContext = SSL_CTX_new(TLS_server_method());
-                minTLSVersion = TLS1_VERSION;
+				_pSSLContext = SSL_CTX_new(TLS_server_method());
+				minTLSVersion = TLS1_VERSION;
 #else
-                _pSSLContext = SSL_CTX_new(TLSv1_server_method());
+				_pSSLContext = SSL_CTX_new(TLSv1_server_method());
 #endif
 			break;
 #endif
@@ -407,40 +407,40 @@ void Context::createSSLContext()
  * OPENSSL_NO_TLS1 is defined in opensslconf.h or on the compiler command line
  * if TLS1.x was removed at OpenSSL library build time via Configure options.
  */
-        case TLSV1_1_CLIENT_USE:
+		case TLSV1_1_CLIENT_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-                _pSSLContext = SSL_CTX_new(TLS_client_method());
-                minTLSVersion = TLS1_1_VERSION;
+				_pSSLContext = SSL_CTX_new(TLS_client_method());
+				minTLSVersion = TLS1_1_VERSION;
 #else
-                _pSSLContext = SSL_CTX_new(TLSv1_1_client_method());
+				_pSSLContext = SSL_CTX_new(TLSv1_1_client_method());
 #endif
-            break;
-        case TLSV1_1_SERVER_USE:
+		    break;
+		case TLSV1_1_SERVER_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-                _pSSLContext = SSL_CTX_new(TLS_server_method());
-                minTLSVersion = TLS1_1_VERSION;
+				_pSSLContext = SSL_CTX_new(TLS_server_method());
+				minTLSVersion = TLS1_1_VERSION;
 #else
-                _pSSLContext = SSL_CTX_new(TLSv1_1_server_method());
+				_pSSLContext = SSL_CTX_new(TLSv1_1_server_method());
 #endif
-            break;
+		    break;
 #endif
 #if defined(SSL_OP_NO_TLSv1_2) && !defined(OPENSSL_NO_TLS1)
-        case TLSV1_2_CLIENT_USE:
+		case TLSV1_2_CLIENT_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-                _pSSLContext = SSL_CTX_new(TLS_client_method());
-                minTLSVersion = TLS1_2_VERSION;
+				_pSSLContext = SSL_CTX_new(TLS_client_method());
+				minTLSVersion = TLS1_2_VERSION;
 #else
-                _pSSLContext = SSL_CTX_new(TLSv1_2_client_method());
+				_pSSLContext = SSL_CTX_new(TLSv1_2_client_method());
 #endif
-            break;
-        case TLSV1_2_SERVER_USE:
+		    break;
+		case TLSV1_2_SERVER_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-                _pSSLContext = SSL_CTX_new(TLS_server_method());
-                minTLSVersion = TLS1_2_VERSION;
+				_pSSLContext = SSL_CTX_new(TLS_server_method());
+				minTLSVersion = TLS1_2_VERSION;
 #else
-                _pSSLContext = SSL_CTX_new(TLSv1_2_server_method());
+				_pSSLContext = SSL_CTX_new(TLSv1_2_server_method());
 #endif
-            break;
+		    break;
 #endif
 		default:
 			throw Poco::InvalidArgumentException("Invalid or unsupported usage");
@@ -454,13 +454,13 @@ void Context::createSSLContext()
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
     if (minTLSVersion)
     {
-        if (!SSL_CTX_set_min_proto_version(_pSSLContext, minTLSVersion))
-        {
-            SSL_CTX_free(_pSSLContext);
-            _pSSLContext = 0;
-            unsigned long err = ERR_get_error();
-            throw SSLException("Cannot set minimum supported version on SSL_CTX object", ERR_error_string(err, 0));
-        }
+		if (!SSL_CTX_set_min_proto_version(_pSSLContext, minTLSVersion))
+		{
+		    SSL_CTX_free(_pSSLContext);
+		    _pSSLContext = 0;
+		    unsigned long err = ERR_get_error();
+		    throw SSLException("Cannot set minimum supported version on SSL_CTX object", ERR_error_string(err, 0));
+		}
     }
 #endif
 	SSL_CTX_set_default_passwd_cb(_pSSLContext, &SSLManager::privateKeyPassphraseCallback);
