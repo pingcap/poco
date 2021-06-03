@@ -387,18 +387,18 @@ void Context::createSSLContext()
 #if defined(SSL_OP_NO_TLSv1) && !defined(OPENSSL_NO_TLS1)
 		case TLSV1_CLIENT_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-				_pSSLContext = SSL_CTX_new(TLS_client_method());
-				minTLSVersion = TLS1_VERSION;
+			_pSSLContext = SSL_CTX_new(TLS_client_method());
+			minTLSVersion = TLS1_VERSION;
 #else
-				_pSSLContext = SSL_CTX_new(TLSv1_client_method());
+			_pSSLContext = SSL_CTX_new(TLSv1_client_method());
 #endif
 			break;
 		case TLSV1_SERVER_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-				_pSSLContext = SSL_CTX_new(TLS_server_method());
-				minTLSVersion = TLS1_VERSION;
+			_pSSLContext = SSL_CTX_new(TLS_server_method());
+			minTLSVersion = TLS1_VERSION;
 #else
-				_pSSLContext = SSL_CTX_new(TLSv1_server_method());
+			_pSSLContext = SSL_CTX_new(TLSv1_server_method());
 #endif
 			break;
 #endif
@@ -409,36 +409,36 @@ void Context::createSSLContext()
  */
 		case TLSV1_1_CLIENT_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-				_pSSLContext = SSL_CTX_new(TLS_client_method());
-				minTLSVersion = TLS1_1_VERSION;
+			_pSSLContext = SSL_CTX_new(TLS_client_method());
+			minTLSVersion = TLS1_1_VERSION;
 #else
-				_pSSLContext = SSL_CTX_new(TLSv1_1_client_method());
+			_pSSLContext = SSL_CTX_new(TLSv1_1_client_method());
 #endif
 		    break;
 		case TLSV1_1_SERVER_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-				_pSSLContext = SSL_CTX_new(TLS_server_method());
-				minTLSVersion = TLS1_1_VERSION;
+			_pSSLContext = SSL_CTX_new(TLS_server_method());
+			minTLSVersion = TLS1_1_VERSION;
 #else
-				_pSSLContext = SSL_CTX_new(TLSv1_1_server_method());
+			_pSSLContext = SSL_CTX_new(TLSv1_1_server_method());
 #endif
 		    break;
 #endif
 #if defined(SSL_OP_NO_TLSv1_2) && !defined(OPENSSL_NO_TLS1)
 		case TLSV1_2_CLIENT_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-				_pSSLContext = SSL_CTX_new(TLS_client_method());
-				minTLSVersion = TLS1_2_VERSION;
+			_pSSLContext = SSL_CTX_new(TLS_client_method());
+			minTLSVersion = TLS1_2_VERSION;
 #else
-				_pSSLContext = SSL_CTX_new(TLSv1_2_client_method());
+			_pSSLContext = SSL_CTX_new(TLSv1_2_client_method());
 #endif
 		    break;
 		case TLSV1_2_SERVER_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-				_pSSLContext = SSL_CTX_new(TLS_server_method());
-				minTLSVersion = TLS1_2_VERSION;
+			_pSSLContext = SSL_CTX_new(TLS_server_method());
+			minTLSVersion = TLS1_2_VERSION;
 #else
-				_pSSLContext = SSL_CTX_new(TLSv1_2_server_method());
+			_pSSLContext = SSL_CTX_new(TLSv1_2_server_method());
 #endif
 		    break;
 #endif
