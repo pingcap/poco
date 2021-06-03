@@ -130,8 +130,7 @@ const DigestEngine::Digest& MD5Engine::digest()
 	/* Store state in digestArray */
 	unsigned char digestArray[16];
 	encode(digestArray, _context.state, 16);
-	_digest.resize(sizeof(digestArray));
-	std::copy(digestArray, digestArray + sizeof(digestArray), _digest.begin());
+	_digest.assign(std::begin(digestArray), std::end(digestArray));
 
 	/* Zeroize sensitive information. */
 	std::memset(&_context, 0, sizeof (_context));
