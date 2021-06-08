@@ -142,8 +142,7 @@ const DigestEngine::Digest& SHA1Engine::digest()
 	unsigned char hash[DIGEST_SIZE];
 	for (count = 0; count < DIGEST_SIZE; count++)
 		hash[count] = (BYTE) ((_context.digest[count>>2]) >> (8*(3-(count & 0x3)))) & 0xff;
-	_digest.clear();
-	_digest.insert(_digest.begin(), hash, hash + DIGEST_SIZE);
+	_digest.assign(std::begin(hash), std::end(hash));
 	reset();
 	return _digest;
 }
