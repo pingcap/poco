@@ -38,22 +38,22 @@ PurgeStrategy::~PurgeStrategy()
 
 void PurgeStrategy::list(const std::string& path, std::vector<File>& files)
 {
-	Path p(path);
-	p.makeAbsolute();
-	Path parent = p.parent();
-	std::string baseName = p.getFileName();
-	baseName.append(".");
+    Path p(path);
+    p.makeAbsolute();
+    Path parent = p.parent();
+    std::string baseName = p.getFileName();
+    baseName.append(".");
 
-	DirectoryIterator it(parent);
-	DirectoryIterator end;
-	while (it != end)
-	{
-		if (it.name().compare(0, baseName.size(), baseName) == 0)
-		{
-			files.push_back(*it);
-		}
-		++it;
-	}
+    DirectoryIterator it(parent);
+    DirectoryIterator end;
+    while (it != end)
+    {
+        if (it.name().compare(0, baseName.size(), baseName) == 0)
+        {
+            files.push_back(*it);
+        }
+        ++it;
+    }
 }
 
 
@@ -74,15 +74,15 @@ PurgeByAgeStrategy::~PurgeByAgeStrategy()
 
 void PurgeByAgeStrategy::purge(const std::string& path)
 {
-	std::vector<File> files;
-	list(path, files);
-	for (std::vector<File>::iterator it = files.begin(); it != files.end(); ++it)
-	{
-		if (it->getLastModified().isElapsed(_age.totalMicroseconds()))
-		{
-			it->remove();
-		}
-	}
+    std::vector<File> files;
+    list(path, files);
+    for (std::vector<File>::iterator it = files.begin(); it != files.end(); ++it)
+    {
+        if (it->getLastModified().isElapsed(_age.totalMicroseconds()))
+        {
+            it->remove();
+        }
+    }
 }
 
 
@@ -93,7 +93,7 @@ void PurgeByAgeStrategy::purge(const std::string& path)
 
 PurgeByCountStrategy::PurgeByCountStrategy(int count): _count(count)
 {
-	poco_assert(count > 0);
+    poco_assert(count > 0);
 }
 
 
@@ -104,34 +104,34 @@ PurgeByCountStrategy::~PurgeByCountStrategy()
 
 void PurgeByCountStrategy::purge(const std::string& path)
 {
-	std::vector<File> files;
-	list(path, files);
-	while (files.size() > _count)
-	{
-		std::vector<File>::iterator it = files.begin();
-		std::vector<File>::iterator purgeIt = it;
-		Timestamp purgeTS = purgeIt->getLastModified();
-		++it;
-		while (it != files.end())
-		{
-			Timestamp md(it->getLastModified());
-			if (md <= purgeTS)
-			{
-				purgeTS = md;
-				purgeIt = it;
-			}
-			++it;
-		}
-		purgeIt->remove();
-		files.erase(purgeIt);
-	}
+    std::vector<File> files;
+    list(path, files);
+    while (files.size() > _count)
+    {
+        std::vector<File>::iterator it = files.begin();
+        std::vector<File>::iterator purgeIt = it;
+        Timestamp purgeTS = purgeIt->getLastModified();
+        ++it;
+        while (it != files.end())
+        {
+            Timestamp md(it->getLastModified());
+            if (md <= purgeTS)
+            {
+                purgeTS = md;
+                purgeIt = it;
+            }
+            ++it;
+        }
+        purgeIt->remove();
+        files.erase(purgeIt);
+    }
 }
 
 
 void PurgeOneFileStrategy::purge(const std::string& path)
 {
-	std::vector<File> files;
-	list(path, files);
+    std::vector<File> files;
+    list(path, files);
 
     if (files.empty())
     {
@@ -145,7 +145,7 @@ void PurgeOneFileStrategy::purge(const std::string& path)
         if (it->getLastModified() < purge_it->getLastModified())
             purge_it = it;
 
-	purge_it->remove();
+    purge_it->remove();
 }
 
 
