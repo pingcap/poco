@@ -433,14 +433,16 @@ private:
 	template <typename F, typename T>
 	void checkUpperLimitFloat(const F& from) const
 	{
-		if (from > std::numeric_limits<T>::max())
+		static_assert(std::is_floating_point<T>);
+		if (from > static_cast<F>(std::numeric_limits<T>::max()))
 			throw RangeException("Value too large.");
 	}
 
 	template <typename F, typename T>
 	void checkLowerLimitFloat(const F& from) const
 	{
-		if (from < -std::numeric_limits<T>::max())
+		static_assert(std::is_floating_point<T>);
+		if (from < static_cast<F>(-std::numeric_limits<T>::max()))
 			throw RangeException("Value too small.");
 	}
 
