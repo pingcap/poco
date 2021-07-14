@@ -25,6 +25,11 @@
 #include <openssl/ssl.h>
 #include <openssl/x509v3.h>
 
+#if defined(BORINGSSL_API_VERSION)
+#if BORINGSSL_API_VERSION <= 9
+#define BORINGSSL_DEPRECATED 1
+#endif
+#endif
 
 namespace Poco {
 namespace Net {
@@ -540,7 +545,7 @@ void Context::initDH(const std::string& dhParamsFile)
 			std::string msg = Utility::getLastError();
 			throw SSLContextException("Error creating Diffie-Hellman parameters", msg);
 		}
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER) && !defined(BORINGSSL_DEPRECATED)
 		BIGNUM* p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
 		BIGNUM* g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
 		DH_set0_pqg(dh, p, 0, g);
@@ -553,7 +558,11 @@ void Context::initDH(const std::string& dhParamsFile)
 #else
 		dh->p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
 		dh->g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
+#ifdef BORINGSSL_DEPRECATED
+		dh->priv_length = 160;
+#else
 		dh->length = 160;
+#endif
 		if ((!dh->p) || (!dh->g))
 		{
 			DH_free(dh);
