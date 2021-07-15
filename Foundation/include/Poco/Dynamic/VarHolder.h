@@ -404,6 +404,7 @@ private:
         static_assert(std::is_integral_v<F> && std::is_integral_v<T>);
         if constexpr (std::is_signed_v<F> == std::is_signed_v<T>)
         {
+            /// F and T have the same sign, compare directly without need of casting.
             if (from > std::numeric_limits<T>::max())
                 throw RangeException("Value too large.");
         }
@@ -411,11 +412,15 @@ private:
         {
             if (from < 0)
                 throw RangeException("Value too small.");
+            /// from is non-negative and T is unsigned.
+            /// UInt64 is safe as their common type.
             if (static_cast<Poco::UInt64>(from) > std::numeric_limits<T>::max())
                 throw RangeException("Value too large.");
         }
         else
         {
+            /// from is unsigned and T::max() is positive.
+            /// UInt64 is safe as their common type.
             if (from > static_cast<Poco::UInt64>(std::numeric_limits<T>::max()))
                 throw RangeException("Value too large.");
         }
@@ -444,16 +449,19 @@ private:
         static_assert(std::is_integral_v<F> && std::is_integral_v<T>);
         if constexpr (std::is_signed_v<F> == std::is_signed_v<T>)
         {
+            /// F and T have the same sign, compare directly without need of casting.
             if (from < std::numeric_limits<T>::min())
                 throw RangeException("Value too small.");
         }
         else if constexpr (std::is_signed_v<F> && !std::is_signed_v<T>)
         {
+            /// T is unsigned so T::min() can only be 0, then we only need to compare from and 0.
             if (from < 0)
                 throw RangeException("Value too small.");
         }
         else
         {
+            /// from is unsigned while T is signed, so from must be larger than T::min() which is negative.
         }
     }
 };
