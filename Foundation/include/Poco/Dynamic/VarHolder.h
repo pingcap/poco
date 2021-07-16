@@ -401,31 +401,28 @@ private:
     template <typename F, typename T>
     void POCO_UNUSED checkUpperLimit(const F& from) const
     {
-        // casting to type of smaller size AND
-        // 'from' is greater than 'T' max value
-        if ((sizeof(T) < sizeof(F)) &&
-            (from > static_cast<F>(std::numeric_limits<T>::max())))
+        static_assert(std::is_integral_v<F> && std::is_integral_v<T>);
+        if constexpr (std::is_signed_v<F> == std::is_signed_v<T>)
         {
-            throw RangeException("Value too large.");
+            /// F and T have the same sign, compare directly without need of casting.
+            if (from > std::numeric_limits<T>::max())
+                throw RangeException("Value too large.");
         }
-        // casting to type of equal/bigger size AND
-        // 'F' is signed AND
-        // 'T' is unsigned AND
-        // 'from' is negative
-        else if (std::numeric_limits<F>::is_signed &&
-                !std::numeric_limits<T>::is_signed && from < 0)
+        else if constexpr (std::is_signed_v<F> && !std::is_signed_v<T>)
         {
-            throw RangeException("Value too small.");
+            if (from < 0)
+                throw RangeException("Value too small.");
+            /// from is non-negative and T is unsigned.
+            /// UInt64 is safe as their common type.
+            if (static_cast<Poco::UInt64>(from) > std::numeric_limits<T>::max())
+                throw RangeException("Value too large.");
         }
-        // casting to type of equal/bigger size AND
-        // 'F' is unsigned AND
-        // 'T' is signed AND
-        // 'from' is greater than 'T' max value
-        else if (!std::numeric_limits<F>::is_signed &&
-                  std::numeric_limits<T>::is_signed &&
-                  static_cast<Poco::UInt64>(from) > std::numeric_limits<T>::max())
+        else
         {
-            throw RangeException("Value too large.");
+            /// from is unsigned and T::max() is positive.
+            /// UInt64 is safe as their common type.
+            if (from > static_cast<Poco::UInt64>(std::numeric_limits<T>::max()))
+                throw RangeException("Value too large.");
         }
     }
 
@@ -434,7 +431,7 @@ private:
     void checkUpperLimitFloat(const F& from) const
     {
         static_assert(std::is_floating_point<T>);
-        if (from > static_cast<F>(std::numeric_limits<T>::max()))
+        if (static_cast<double>(from) > static_cast<double>(std::numeric_limits<T>::max()))
             throw RangeException("Value too large.");
     }
 
@@ -442,15 +439,30 @@ private:
     void checkLowerLimitFloat(const F& from) const
     {
         static_assert(std::is_floating_point<T>);
-        if (from < static_cast<F>(-std::numeric_limits<T>::max()))
+        if (static_cast<double>(from) < static_cast<double>(-std::numeric_limits<T>::max()))
             throw RangeException("Value too small.");
     }
 
     template <typename F, typename T>
     void checkLowerLimit(const F& from) const
     {
-        if (from < std::numeric_limits<T>::min())
-            throw RangeException("Value too small.");
+        static_assert(std::is_integral_v<F> && std::is_integral_v<T>);
+        if constexpr (std::is_signed_v<F> == std::is_signed_v<T>)
+        {
+            /// F and T have the same sign, compare directly without need of casting.
+            if (from < std::numeric_limits<T>::min())
+                throw RangeException("Value too small.");
+        }
+        else if constexpr (std::is_signed_v<F> && !std::is_signed_v<T>)
+        {
+            /// T is unsigned so T::min() can only be 0, then we only need to compare from and 0.
+            if (from < 0)
+                throw RangeException("Value too small.");
+        }
+        else
+        {
+            /// from is unsigned while T is signed, so from must be larger than T::min() which is negative.
+        }
     }
 };
 
