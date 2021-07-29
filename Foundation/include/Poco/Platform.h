@@ -132,6 +132,7 @@
 #define POCO_ARCH_SH      0x0d
 #define POCO_ARCH_NIOS2   0x0e
 #define POCO_ARCH_AARCH64 0x0f
+#define POCO_ARCH_ARM64   0x0f // same as POCO_ARCH_AARCH64
 
 
 #if defined(__ALPHA) || defined(__alpha) || defined(__alpha__) || defined(_M_ALPHA)
