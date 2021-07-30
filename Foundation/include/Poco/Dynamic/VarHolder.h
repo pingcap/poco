@@ -312,16 +312,8 @@ protected:
         poco_static_assert (std::numeric_limits<F>::is_signed);
         poco_static_assert (std::numeric_limits<T>::is_signed);
 
-        if (std::numeric_limits<F>::is_integer)
-        {
-            checkUpperLimit<F,T>(from);
-            checkLowerLimit<F,T>(from);
-        }
-        else
-        {
-            checkUpperLimitFloat<F,T>(from);
-            checkLowerLimitFloat<F,T>(from);
-        }
+        checkUpperLimit<F,T>(from);
+        checkLowerLimit<F,T>(from);
         
         to = static_cast<T>(from);
     }
@@ -401,8 +393,11 @@ private:
     template <typename F, typename T>
     void POCO_UNUSED checkUpperLimit(const F& from) const
     {
-        static_assert(std::is_integral_v<F> && std::is_integral_v<T>);
-        if constexpr (std::is_signed_v<F> == std::is_signed_v<T>)
+        if constexpr (std::is_floating_point_v<F> || std::is_floating_point_v<T>)
+        {
+            checkUpperLimitFloat<F, T>(from);
+        }
+        else if constexpr (std::is_signed_v<F> == std::is_signed_v<T>)
         {
             /// F and T have the same sign, compare directly without need of casting.
             if (from > std::numeric_limits<T>::max())
@@ -430,7 +425,7 @@ private:
     template <typename F, typename T>
     void checkUpperLimitFloat(const F& from) const
     {
-        static_assert(std::is_floating_point<T>);
+        static_assert(std::is_floating_point_v<F> || std::is_floating_point_v<T>);
         if (static_cast<double>(from) > static_cast<double>(std::numeric_limits<T>::max()))
             throw RangeException("Value too large.");
     }
@@ -438,7 +433,7 @@ private:
     template <typename F, typename T>
     void checkLowerLimitFloat(const F& from) const
     {
-        static_assert(std::is_floating_point<T>);
+        static_assert(std::is_floating_point_v<F> || std::is_floating_point_v<T>);
         if (static_cast<double>(from) < static_cast<double>(-std::numeric_limits<T>::max()))
             throw RangeException("Value too small.");
     }
@@ -446,8 +441,11 @@ private:
     template <typename F, typename T>
     void checkLowerLimit(const F& from) const
     {
-        static_assert(std::is_integral_v<F> && std::is_integral_v<T>);
-        if constexpr (std::is_signed_v<F> == std::is_signed_v<T>)
+        if constexpr (std::is_floating_point_v<F> || std::is_floating_point_v<T>)
+        {
+            checkLowerLimitFloat<F, T>(from);
+        }
+        else if constexpr (std::is_signed_v<F> == std::is_signed_v<T>)
         {
             /// F and T have the same sign, compare directly without need of casting.
             if (from < std::numeric_limits<T>::min())
