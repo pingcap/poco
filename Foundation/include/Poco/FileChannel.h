@@ -233,15 +233,13 @@ public:
 protected:
 	~FileChannel();
 	void setRotation(const std::string& rotation);
-	void setArchive(const std::string& archive);
+	virtual void setArchive(const std::string& archive);
 	void setCompress(const std::string& compress);
 	void setPurgeAge(const std::string& age);
 	void setPurgeCount(const std::string& count);
 	void setFlush(const std::string& flush);
 	void setRotateOnOpen(const std::string& rotateOnOpen);
 	void purge();
-
-private:
 	bool setNoPurge(const std::string& value);
 	int extractDigit(const std::string& value, std::string::const_iterator* nextToDigit = NULL) const;
 	void setPurgeStrategy(PurgeStrategy* strategy);

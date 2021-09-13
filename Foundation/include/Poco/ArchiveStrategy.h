@@ -89,7 +89,7 @@ public:
 	{
 	}
 	
-	LogFile* archive(LogFile* pFile)
+	virtual LogFile* archive(LogFile* pFile)
 		/// Archives the file by appending the current timestamp to the
 		/// file name. If the new file name exists, additionally a monotonic
 		/// increasing number is appended to the log file name.
@@ -106,7 +106,7 @@ public:
 		return new LogFile(path);
 	}
 
-private:
+protected:
 	void archiveByNumber(const std::string& basePath)
 		/// A monotonic increasing number is appended to the
 		/// log file name. The most recent archived file

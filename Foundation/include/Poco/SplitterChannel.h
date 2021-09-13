@@ -62,8 +62,6 @@ public:
 
 protected:
 	~SplitterChannel();
-
-private:
 	typedef std::vector<Channel*> ChannelVec;
 	
 	ChannelVec        _channels;
