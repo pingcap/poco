@@ -89,7 +89,7 @@ public:
 	{
 	}
 	
-	virtual LogFile* archive(LogFile* pFile)
+	LogFile* archive(LogFile* pFile)
 		/// Archives the file by appending the current timestamp to the
 		/// file name. If the new file name exists, additionally a monotonic
 		/// increasing number is appended to the log file name.
