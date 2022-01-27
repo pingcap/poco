@@ -149,13 +149,13 @@ inline bool Random::nextBool()
 	
 inline float Random::nextFloat()
 {
-	return float(next()) / 0x7FFFFFFF;
+	return float(next()) / static_cast<float>(0x7FFFFFFF);
 }
 
 	
 inline double Random::nextDouble()
 {
-	return double(next()) / 0x7FFFFFFF;
+	return double(next()) / static_cast<double>(0x7FFFFFFF);
 }
 
 
