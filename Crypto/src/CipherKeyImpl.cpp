@@ -56,11 +56,12 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 
 CipherKeyImpl::CipherKeyImpl(const std::string& name,
 	const ByteVec& key,
-	const ByteVec& iv): _pCipher(0),
-		_pDigest(0),
-		_name(name),
-		_key(key),
-		_iv(iv)
+	const ByteVec& iv):
+	_pCipher(0),
+	_pDigest(0),
+	_name(name),
+	_key(key),
+	_iv(iv)
 {
 	// dummy access to Cipherfactory so that the EVP lib is initilaized
 	CipherFactory::defaultFactory();
@@ -70,8 +71,9 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 		throw Poco::NotFoundException("Cipher " + name + " was not found");
 }
 
-	
-CipherKeyImpl::CipherKeyImpl(const std::string& name): _pCipher(0),
+
+CipherKeyImpl::CipherKeyImpl(const std::string& name):
+	_pCipher(0),
 	_pDigest(0),
 	_name(name),
 	_key(),
@@ -112,6 +114,15 @@ CipherKeyImpl::Mode CipherKeyImpl::mode() const
 
 	case EVP_CIPH_OFB_MODE:
 		return MODE_OFB;
+
+#if OPENSSL_VERSION_NUMBER >= 0x10001000L
+	case EVP_CIPH_CTR_MODE:
+		return MODE_CTR;
+
+	case EVP_CIPH_GCM_MODE:
+		return MODE_GCM;
+
+#endif
 	}
 	throw Poco::IllegalStateException("Unexpected value of EVP_CIPHER_mode()");
 }
@@ -123,7 +134,7 @@ void CipherKeyImpl::generateKey()
 
 	getRandomBytes(vec, keySize());
 	setKey(vec);
-	
+
 	getRandomBytes(vec, ivSize());
 	setIV(vec);
 }
@@ -132,7 +143,7 @@ void CipherKeyImpl::generateKey()
 void CipherKeyImpl::getRandomBytes(ByteVec& vec, std::size_t count)
 {
 	Poco::RandomInputStream random;
-	
+
 	vec.clear();
 	vec.reserve(count);
 
