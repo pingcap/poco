@@ -25,8 +25,6 @@ DigestEngine::DigestEngine(const std::string& name):
 	_pContext(EVP_MD_CTX_create())
 {
 	const EVP_MD* md = EVP_get_digestbyname(_name.c_str());
-	// if (!md) throw OpenSSLException(_name);
-	// EVP_DigestInit_ex(_pContext, md, NULL);	
 	if (!md) throw Poco::NotFoundException(_name);
 	EVP_DigestInit_ex(_pContext, md, NULL);
 }
