@@ -49,7 +49,7 @@ private:
 		const std::vector<int>& certOrder);
 	void full(const Poco::Crypto::PKCS12Container& pkcs12);
 	void fullCert(const Poco::Crypto::X509Certificate& x509);
-	void fullList(const Poco::Crypto::PKCS12Container::CAList& caList,
+	void fullList(Poco::Crypto::PKCS12Container::CAList caList,
 		const Poco::Crypto::PKCS12Container::CANameList& caNamesList,
 		const std::vector<int>& certOrder);
 };

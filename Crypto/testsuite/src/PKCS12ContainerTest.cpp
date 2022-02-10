@@ -15,6 +15,7 @@
 #include "Poco/Environment.h"
 #include "Poco/Path.h"
 #include "Poco/File.h"
+#include "Poco/String.h"
 #include "Poco/TemporaryFile.h"
 #include <iostream>
 #include <sstream>
@@ -117,8 +118,9 @@ void PKCS12ContainerTest::fullCert(const X509Certificate& x509)
 }
 
 
-void PKCS12ContainerTest::fullList(const PKCS12Container::CAList& caList,
-	const PKCS12Container::CANameList& caNamesList, const std::vector<int>& certOrder)
+void PKCS12ContainerTest::fullList(PKCS12Container::CAList caList,
+		const PKCS12Container::CANameList& caNamesList,
+		const std::vector<int>& certOrder)
 {
 	assert (certOrder.size() == caList.size());
 	assert ((0 == caNamesList.size()) || (certOrder.size() == caNamesList.size()));
@@ -129,6 +131,12 @@ void PKCS12ContainerTest::fullList(const PKCS12Container::CAList& caList,
 		assert (caNamesList[certOrder[1]].empty());
 	}
 
+	// boringssl has different order
+	std::sort(caList.begin(), caList.end(), [&](const auto &a, const auto &b)
+	{
+		return a.subjectName() > b.subjectName();
+	});
+
 	assert (caList[certOrder[0]].subjectName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
 	assert (caList[certOrder[0]].issuerName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
 	assert (caList[certOrder[0]].commonName() == "CV Root CA v3");
@@ -138,7 +146,8 @@ void PKCS12ContainerTest::fullList(const PKCS12Container::CAList& caList,
 	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Crypto Vally");
 	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
 	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
-	assert (caList[certOrder[0]].serialNumber() == "C3ECA1FCEAA16055");
+	// boringssl returnes lowercase serial
+	assert (Poco::toLower(caList[certOrder[0]].serialNumber()) == "c3eca1fceaa16055");
 	assert (caList[certOrder[0]].version() == 3);
 	assert (caList[certOrder[0]].signatureAlgorithm() == "sha256WithRSAEncryption");
 
