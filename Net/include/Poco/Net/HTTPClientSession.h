@@ -120,7 +120,10 @@ public:
 		/// The port number must not be changed once there is an
 		/// open connection to the server.
 
-    void setResolvedHost(std::string resolved_host) { _resolved_host.swap(resolved_host); }
+	void setResolvedHost(std::string resolved_host) { _resolved_host.swap(resolved_host); }
+
+	std::string getResolvedAddress() const;
+		/// Returns the resolved host name and port of the target HTTP server.
 
     Poco::UInt16 getPort() const;
 		/// Returns the port number of the target HTTP server.
@@ -326,6 +329,12 @@ private:
 //
 // inlines
 //
+
+inline std::string HTTPClientSession::getResolvedAddress() const
+{
+    return (_resolved_host.empty() ? _host : _resolved_host) + ':' + std::to_string(_port);
+}
+
 inline const std::string& HTTPClientSession::getHost() const
 {
 	return _host;
