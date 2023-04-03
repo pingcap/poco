@@ -19,6 +19,8 @@
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
+#include "Poco/DirectoryIterator.h"
+#include "Poco/RegularExpression.h"
 #include "Poco/Timestamp.h"
 #include <openssl/bio.h>
 #include <openssl/err.h>
@@ -115,11 +117,119 @@ Context::~Context()
 	}
 }
 
+static bool poco_dir_cert(const std::string & dir)
+{
+	if (dir.empty())
+		return false;
+
+	File f(dir);
+	return f.exists() && f.isDirectory();
+}
+
+static bool poco_dir_contains_certs(const std::string & dir)
+{
+	RegularExpression re("^[a-fA-F0-9]{8}\\.\\d$");
+	try
+	{
+		for (DirectoryIterator it(dir), end; it != end; ++it)
+			if (re.match(Path(it->path()).getFileName()))
+				return true;
+	}
+	catch (Poco::Exception& exc) {}
+
+	return false;
+}
+
+static bool poco_file_cert(const std::string & file)
+{
+	if (file.empty())
+		return false;
+
+	File f(file);
+	return f.exists() && f.isFile();
+}
+
+static int poco_ssl_probe_and_set_default_ca_location(SSL_CTX *ctx, Context::CAPaths &caPaths)
+{
+	/* The probe paths are based on:
+		* https://www.happyassassin.net/posts/2015/01/12/a-note-about-ssltls-trusted-certificate-stores-and-platforms/
+		* Golang's crypto probing paths:
+		*   https://golang.org/search?q=certFiles   and certDirectories
+		*/
+	static const char *paths[] = {
+		"/etc/pki/tls/certs/ca-bundle.crt",
+		"/etc/ssl/certs/ca-bundle.crt",
+		"/etc/pki/tls/certs/ca-bundle.trust.crt",
+		"/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem",
+
+		"/etc/ssl/ca-bundle.pem",
+		"/etc/pki/tls/cacert.pem",
+		"/etc/ssl/cert.pem",
+		"/etc/ssl/cacert.pem",
+
+		"/etc/certs/ca-certificates.crt",
+		"/etc/ssl/certs/ca-certificates.crt",
+
+		"/etc/ssl/certs",
+
+		"/usr/local/etc/ssl/cert.pem",
+		"/usr/local/etc/ssl/cacert.pem",
+
+		"/usr/local/etc/ssl/certs/cert.pem",
+		"/usr/local/etc/ssl/certs/cacert.pem",
+
+		/* BSD */
+		"/usr/local/share/certs/ca-root-nss.crt",
+		"/etc/openssl/certs/ca-certificates.crt",
+#ifdef __APPLE__
+		"/private/etc/ssl/cert.pem",
+		"/private/etc/ssl/certs",
+		"/usr/local/etc/openssl@1.1/cert.pem",
+		"/usr/local/etc/openssl@1.0/cert.pem",
+		"/usr/local/etc/openssl/certs",
+		"/System/Library/OpenSSL",
+#endif
+#ifdef _AIX
+		"/var/ssl/certs/ca-bundle.crt",
+#endif
+	};
+
+	const char * dir = nullptr;
+	for (const char * path : paths)
+	{
+		if (poco_dir_cert(path))
+		{
+			if (dir == nullptr)
+				dir = path;
+
+			if (poco_dir_contains_certs(path) && SSL_CTX_load_verify_locations(ctx, NULL, path))
+			{
+				caPaths.caDefaultDir = path;
+				return 1;
+			}
+		}
+
+		if (SSL_CTX_load_verify_locations(ctx, path, NULL))
+		{
+			caPaths.caDefaultFile = path;
+			return 1;
+		}
+	}
+
+	if (dir != nullptr)
+	{
+		caPaths.caDefaultDir = dir;
+		return SSL_CTX_load_verify_locations(ctx, NULL, dir);
+	}
+
+	return 0;
+}
+
 
 void Context::init(const Params& params)
 {
 	Poco::Crypto::OpenSSLInitializer::initialize();
-	
+
 	createSSLContext();
 
 	try
@@ -137,11 +247,42 @@ void Context::init(const Params& params)
 				std::string msg = Utility::getLastError();
 				throw SSLContextException(std::string("Cannot load CA file/directory at ") + params.caLocation, msg);
 			}
+			_caPaths.caLocation = params.caLocation;
 		}
 
 		if (params.loadDefaultCAs)
 		{
-			errCode = SSL_CTX_set_default_verify_paths(_pSSLContext);
+			const char * dir = getenv(X509_get_default_cert_dir_env());
+			if (!dir)
+				dir = X509_get_default_cert_dir();
+
+			const char * file = getenv(X509_get_default_cert_file_env());
+			if (!file)
+				file = X509_get_default_cert_file();
+
+			if (poco_file_cert(file))
+			{
+				_caPaths.caDefaultFile = file;
+				errCode = SSL_CTX_set_default_verify_paths(_pSSLContext);
+			}
+			else
+			{
+				if (poco_dir_cert(dir))
+				{
+					errCode = 0;
+					if (!poco_dir_contains_certs(dir))
+						errCode = poco_ssl_probe_and_set_default_ca_location(_pSSLContext, _caPaths);
+
+					if (errCode == 0)
+					{
+						errCode = SSL_CTX_set_default_verify_paths(_pSSLContext);
+						_caPaths.caDefaultDir = dir;
+					}
+				}
+				else
+					errCode = poco_ssl_probe_and_set_default_ca_location(_pSSLContext, _caPaths);
+			}
+
 			if (errCode != 1)
 			{
 				std::string msg = Utility::getLastError();
@@ -178,7 +319,7 @@ void Context::init(const Params& params)
 		SSL_CTX_set_verify_depth(_pSSLContext, params.verificationDepth);
 		SSL_CTX_set_mode(_pSSLContext, SSL_MODE_AUTO_RETRY);
 		SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
-		
+
 		initDH(params.dhParamsFile);
 		initECDH(params.ecdhCurve);
 	}
@@ -200,7 +341,7 @@ void Context::useCertificate(const Poco::Crypto::X509Certificate& certificate)
 	}
 }
 
-	
+
 void Context::addChainCertificate(const Poco::Crypto::X509Certificate& certificate)
 {
 	X509* pCert = certificate.dup();
@@ -213,7 +354,26 @@ void Context::addChainCertificate(const Poco::Crypto::X509Certificate& certifica
 	}
 }
 
-	
+
+void Context::addCertificateAuthority(const Crypto::X509Certificate &certificate)
+{
+	if (X509_STORE* store = SSL_CTX_get_cert_store(_pSSLContext))
+	{
+		int errCode = X509_STORE_add_cert(store, const_cast<X509*>(certificate.certificate()));
+		if (errCode != 1)
+		{
+			std::string msg = Utility::getLastError();
+			throw SSLContextException("Cannot add certificate authority to Context", msg);
+		}
+	}
+	else
+	{
+		std::string msg = Utility::getLastError();
+		throw SSLContextException("Cannot add certificate authority to Context", msg);
+	}
+}
+
+
 void Context::usePrivateKey(const Poco::Crypto::RSAKey& key)
 {
 	int errCode = SSL_CTX_use_RSAPrivateKey(_pSSLContext, key.impl()->getRSA());
@@ -250,7 +410,7 @@ void Context::enableSessionCache(bool flag, const std::string& sessionIdContext)
 	{
 		SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
 	}
-	
+
 	unsigned length = static_cast<unsigned>(sessionIdContext.length());
 	if (length > SSL_MAX_SSL_SESSION_ID_LENGTH) length = SSL_MAX_SSL_SESSION_ID_LENGTH;
 	int rc = SSL_CTX_set_session_id_context(_pSSLContext, reinterpret_cast<const unsigned char*>(sessionIdContext.data()), length);
@@ -267,15 +427,15 @@ bool Context::sessionCacheEnabled() const
 void Context::setSessionCacheSize(std::size_t size)
 {
 	poco_assert (isForServerUse());
-	
+
 	SSL_CTX_sess_set_cache_size(_pSSLContext, static_cast<long>(size));
 }
 
-	
+
 std::size_t Context::getSessionCacheSize() const
 {
 	poco_assert (isForServerUse());
-	
+
 	return static_cast<std::size_t>(SSL_CTX_sess_get_cache_size(_pSSLContext));
 }
 
@@ -361,118 +521,123 @@ void Context::preferServerCiphers()
 #endif
 }
 
+const Context::CAPaths &Context::getCAPaths()
+{
+	return _caPaths;
+}
+
 
 void Context::createSSLContext()
 {
-	int minTLSVersion = 0;
-	if (SSLManager::isFIPSEnabled())
-	{
+    int minTLSVersion = 0;
+    if (SSLManager::isFIPSEnabled())
+    {
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-		_pSSLContext = SSL_CTX_new(TLS_method());
+        _pSSLContext = SSL_CTX_new(TLS_method());
 #else
-		_pSSLContext = SSL_CTX_new(TLSv1_method());
+        _pSSLContext = SSL_CTX_new(TLSv1_method());
 #endif
-	}
-	else
-	{
-		switch (_usage)
-		{
-		case CLIENT_USE:
+    }
+    else
+    {
+        switch (_usage)
+        {
+        case CLIENT_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-			_pSSLContext = SSL_CTX_new(TLS_client_method());
+            _pSSLContext = SSL_CTX_new(TLS_client_method());
 #else
-			_pSSLContext = SSL_CTX_new(SSLv23_client_method());
+            _pSSLContext = SSL_CTX_new(SSLv23_client_method());
 #endif
-			break;
-		case SERVER_USE:
+            break;
+        case SERVER_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-			_pSSLContext = SSL_CTX_new(TLS_server_method());
+            _pSSLContext = SSL_CTX_new(TLS_server_method());
 #else
-			_pSSLContext = SSL_CTX_new(SSLv23_server_method());
+            _pSSLContext = SSL_CTX_new(SSLv23_server_method());
 #endif
-			break;
+            break;
 #if defined(SSL_OP_NO_TLSv1) && !defined(OPENSSL_NO_TLS1)
-		case TLSV1_CLIENT_USE:
+        case TLSV1_CLIENT_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-			_pSSLContext = SSL_CTX_new(TLS_client_method());
-			minTLSVersion = TLS1_VERSION;
+            _pSSLContext = SSL_CTX_new(TLS_client_method());
+            minTLSVersion = TLS1_VERSION;
 #else
-			_pSSLContext = SSL_CTX_new(TLSv1_client_method());
+            _pSSLContext = SSL_CTX_new(TLSv1_client_method());
 #endif
-			break;
-		case TLSV1_SERVER_USE:
+            break;
+        case TLSV1_SERVER_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-			_pSSLContext = SSL_CTX_new(TLS_server_method());
-			minTLSVersion = TLS1_VERSION;
+            _pSSLContext = SSL_CTX_new(TLS_server_method());
+            minTLSVersion = TLS1_VERSION;
 #else
-			_pSSLContext = SSL_CTX_new(TLSv1_server_method());
+            _pSSLContext = SSL_CTX_new(TLSv1_server_method());
 #endif
-			break;
+            break;
 #endif
 #if defined(SSL_OP_NO_TLSv1_1) && !defined(OPENSSL_NO_TLS1)
-/* SSL_OP_NO_TLSv1_1 is defined in ssl.h if the library version supports TLSv1.1.
+            /* SSL_OP_NO_TLSv1_1 is defined in ssl.h if the library version supports TLSv1.1.
  * OPENSSL_NO_TLS1 is defined in opensslconf.h or on the compiler command line
  * if TLS1.x was removed at OpenSSL library build time via Configure options.
  */
-		case TLSV1_1_CLIENT_USE:
+        case TLSV1_1_CLIENT_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-			_pSSLContext = SSL_CTX_new(TLS_client_method());
-			minTLSVersion = TLS1_1_VERSION;
+            _pSSLContext = SSL_CTX_new(TLS_client_method());
+            minTLSVersion = TLS1_1_VERSION;
 #else
-			_pSSLContext = SSL_CTX_new(TLSv1_1_client_method());
+            _pSSLContext = SSL_CTX_new(TLSv1_1_client_method());
 #endif
-		    break;
-		case TLSV1_1_SERVER_USE:
+            break;
+        case TLSV1_1_SERVER_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-			_pSSLContext = SSL_CTX_new(TLS_server_method());
-			minTLSVersion = TLS1_1_VERSION;
+            _pSSLContext = SSL_CTX_new(TLS_server_method());
+            minTLSVersion = TLS1_1_VERSION;
 #else
-			_pSSLContext = SSL_CTX_new(TLSv1_1_server_method());
+            _pSSLContext = SSL_CTX_new(TLSv1_1_server_method());
 #endif
-		    break;
+            break;
 #endif
 #if defined(SSL_OP_NO_TLSv1_2) && !defined(OPENSSL_NO_TLS1)
-		case TLSV1_2_CLIENT_USE:
+        case TLSV1_2_CLIENT_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-			_pSSLContext = SSL_CTX_new(TLS_client_method());
-			minTLSVersion = TLS1_2_VERSION;
+            _pSSLContext = SSL_CTX_new(TLS_client_method());
+            minTLSVersion = TLS1_2_VERSION;
 #else
-			_pSSLContext = SSL_CTX_new(TLSv1_2_client_method());
+            _pSSLContext = SSL_CTX_new(TLSv1_2_client_method());
 #endif
-		    break;
-		case TLSV1_2_SERVER_USE:
+            break;
+        case TLSV1_2_SERVER_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-			_pSSLContext = SSL_CTX_new(TLS_server_method());
-			minTLSVersion = TLS1_2_VERSION;
+            _pSSLContext = SSL_CTX_new(TLS_server_method());
+            minTLSVersion = TLS1_2_VERSION;
 #else
-			_pSSLContext = SSL_CTX_new(TLSv1_2_server_method());
+            _pSSLContext = SSL_CTX_new(TLSv1_2_server_method());
 #endif
-		    break;
+            break;
 #endif
-		default:
-			throw Poco::InvalidArgumentException("Invalid or unsupported usage");
-		}
-	}
-	if (!_pSSLContext)
-	{
-		unsigned long err = ERR_get_error();
-		throw SSLException("Cannot create SSL_CTX object", ERR_error_string(err, 0));
-	}
+        default:
+            throw Poco::InvalidArgumentException("Invalid or unsupported usage");
+        }
+    }
+    if (!_pSSLContext)
+    {
+        unsigned long err = ERR_get_error();
+        throw SSLException("Cannot create SSL_CTX object", ERR_error_string(err, 0));
+    }
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
     if (minTLSVersion)
     {
-		if (!SSL_CTX_set_min_proto_version(_pSSLContext, minTLSVersion))
-		{
-		    SSL_CTX_free(_pSSLContext);
-		    _pSSLContext = 0;
-		    unsigned long err = ERR_get_error();
-		    throw SSLException("Cannot set minimum supported version on SSL_CTX object", ERR_error_string(err, 0));
-		}
+        if (!SSL_CTX_set_min_proto_version(_pSSLContext, minTLSVersion))
+        {
+            SSL_CTX_free(_pSSLContext);
+            _pSSLContext = 0;
+            unsigned long err = ERR_get_error();
+            throw SSLException("Cannot set minimum supported version on SSL_CTX object", ERR_error_string(err, 0));
+        }
     }
 #endif
-	SSL_CTX_set_default_passwd_cb(_pSSLContext, &SSLManager::privateKeyPassphraseCallback);
-	Utility::clearErrorStack();
-	SSL_CTX_set_options(_pSSLContext, SSL_OP_ALL);
+    SSL_CTX_set_default_passwd_cb(_pSSLContext, &SSLManager::privateKeyPassphraseCallback);
+    Utility::clearErrorStack();
+    SSL_CTX_set_options(_pSSLContext, SSL_OP_ALL);
 }
 
 
@@ -579,7 +744,7 @@ void Context::initDH(const std::string& dhParamsFile)
 #endif
 }
 
-	
+
 void Context::initECDH(const std::string& curve)
 {
 #if OPENSSL_VERSION_NUMBER >= 0x0090800fL

@@ -119,8 +119,10 @@ public:
 		///
 		/// The port number must not be changed once there is an
 		/// open connection to the server.
-	
-	Poco::UInt16 getPort() const;
+
+    void setResolvedHost(std::string resolved_host) { _resolved_host.swap(resolved_host); }
+
+    Poco::UInt16 getPort() const;
 		/// Returns the port number of the target HTTP server.
 
 	void setProxy(const std::string& host, Poco::UInt16 port = HTTPSession::HTTP_PORT);
@@ -300,7 +302,8 @@ protected:
 
 private:
 	std::string     _host;
-	Poco::UInt16    _port;
+    std::string 	_resolved_host;
+    Poco::UInt16    _port;
 	ProxyConfig     _proxyConfig;
 	Poco::Timespan  _keepAliveTimeout;
 	Poco::Timestamp _lastRequest;

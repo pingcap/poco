@@ -123,10 +123,18 @@ X509Certificate HTTPSClientSession::serverCertificate()
 	return sss.peerCertificate();
 }
 
-
 std::string HTTPSClientSession::proxyRequestPrefix() const
 {
-	return std::string();
+    std::string result("https://");
+    result.append(getHost());
+    /// Do not append by default, since this may break some servers.
+    /// One example of such server is GCS (Google Cloud Storage).
+    if (getPort() != HTTPS_PORT)
+    {
+        result.append(":");
+        NumberFormatter::append(result, getPort());
+    }
+    return result;
 }
 
 

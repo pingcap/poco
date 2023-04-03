@@ -373,8 +373,8 @@ void HTTPClientSession::reconnect()
 {
 	if (_proxyConfig.host.empty() || bypassProxy())
 	{
-		SocketAddress addr(_host, _port);
-		connect(addr);
+        SocketAddress addr(_resolved_host.empty() ? _host : _resolved_host, _port);
+        connect(addr);
 	}
 	else
 	{
@@ -388,9 +388,14 @@ std::string HTTPClientSession::proxyRequestPrefix() const
 {
 	std::string result("http://");
 	result.append(_host);
-	result.append(":");
-	NumberFormatter::append(result, _port);
-	return result;
+    /// Do not append by default, since this may break some servers.
+    /// One example of such server is GCS (Google Cloud Storage).
+    if (_port != HTTPSession::HTTP_PORT)
+    {
+        result.append(":");
+        NumberFormatter::append(result, _port);
+    }
+    return result;
 }
 
 
