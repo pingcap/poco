@@ -26,6 +26,7 @@
 #include "Poco/AutoPtr.h"
 #include <openssl/ssl.h>
 #include <cstdlib>
+#include <functional>
 
 
 namespace Poco {
