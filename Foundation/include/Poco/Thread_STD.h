@@ -30,13 +30,6 @@
 #include <thread>
 
 
-#ifdef __APPLE__
-#define thread_local __thread
-#elif defined(_MSC_VER)
-#include "Poco/UnWindows.h"
-#endif
-
-
 namespace Poco {
 
 
