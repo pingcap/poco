@@ -191,7 +191,7 @@ void HTTPClientSession::setKeepAliveTimeout(const Poco::Timespan& timeout)
 }
 
 
-std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
+std::ostream & HTTPClientSession::sendRequest(HTTPRequest & request, HTTPSendMetrics* metrics)
 {
 	clearException();
 	_pResponseStream = 0;
@@ -206,7 +206,14 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 	try
 	{
 		if (!connected())
+		{
+			Poco::Timestamp connectTimestamp;
 			reconnect();
+			if (metrics)
+			{
+				metrics->connect_ms = connectTimestamp.elapsed() / 1000.0;
+			}
+		}
 		if (!keepAlive)
 			request.setKeepAlive(false);
 		if (!request.has(HTTPRequest::HOST) && !_host.empty())
@@ -218,6 +225,8 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 		}
 		_reconnect = keepAlive;
 		_expectResponseBody = request.getMethod() != HTTPRequest::HTTP_HEAD;
+
+		Poco::Timestamp sendTimestamp;
 		const std::string& method = request.getMethod();
 		if (request.getChunkedTransferEncoding())
 		{
@@ -373,8 +382,8 @@ void HTTPClientSession::reconnect()
 {
 	if (_proxyConfig.host.empty() || bypassProxy())
 	{
-        SocketAddress addr(_resolved_host.empty() ? _host : _resolved_host, _port);
-        connect(addr);
+		SocketAddress addr(_resolved_host.empty() ? _host : _resolved_host, _port);
+		connect(addr);
 	}
 	else
 	{
@@ -388,14 +397,14 @@ std::string HTTPClientSession::proxyRequestPrefix() const
 {
 	std::string result("http://");
 	result.append(_host);
-    /// Do not append by default, since this may break some servers.
-    /// One example of such server is GCS (Google Cloud Storage).
-    if (_port != HTTPSession::HTTP_PORT)
-    {
-        result.append(":");
-        NumberFormatter::append(result, _port);
-    }
-    return result;
+	/// Do not append by default, since this may break some servers.
+	/// One example of such server is GCS (Google Cloud Storage).
+	if (_port != HTTPSession::HTTP_PORT)
+	{
+		result.append(":");
+		NumberFormatter::append(result, _port);
+	}
+	return result;
 }
 
 
