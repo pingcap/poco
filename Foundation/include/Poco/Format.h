@@ -119,7 +119,7 @@ void format(std::string &result, const std::string &fmt, T arg1, Args... args)
 	std::vector<Any> values;
 	values.push_back(arg1);
 	values.insert(values.end(), { args... });
-	format(result, fmt, values);
+	Poco::format(result, fmt, values);
 }
 
 
@@ -132,7 +132,7 @@ std::string format(FMT &fmt, T arg1, Args... args)
 	values.push_back(arg1);
 	values.insert(values.end(), { args... });
 	std::string result;
-	format(result, fmt, values);
+	Poco::format(result, fmt, values);
 	return result;
 }
 
