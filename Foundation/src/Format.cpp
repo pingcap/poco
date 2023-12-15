@@ -243,14 +243,14 @@ namespace
 
 std::string format(const std::string& fmt, const Any& value) {
 	std::string result;
-	format(result, fmt, value);
+	Poco::format(result, fmt, value);
 	return result;
 }
 
 
 void format(std::string& result, const char *fmt, const std::vector<Any>& values)
 {
-	format(result, std::string(fmt), values);
+	Poco::format(result, std::string(fmt), values);
 }
 
 
