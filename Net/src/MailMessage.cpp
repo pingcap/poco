@@ -104,6 +104,13 @@ namespace
 				NameValueCollection::ConstIterator it = header.begin();
 				NameValueCollection::ConstIterator end = header.end();
 				bool added = false;
+
+				if (contentDisp.empty())
+				{
+					_pMsg->addContent(pPS, cte);
+					added = true;
+				}
+
 				for (; it != end; ++it)
 				{
 					if (!added && MailMessage::HEADER_CONTENT_DISPOSITION == it->first)
@@ -116,12 +123,6 @@ namespace
 					}
 					
 					pPS->headers().set(it->first, it->second);
-				}
-
-				if (contentDisp.empty())
-				{
-					_pMsg->addContent(pPS, cte);
-					added = true;
 				}
 
 				if (!added) delete pPS;

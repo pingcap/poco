@@ -12,6 +12,7 @@
 #include "Poco/CppUnit/TestCaller.h"
 #include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/MailMessage.h"
+#include "Poco/Net/MailStream.h"
 #include "Poco/Net/MailRecipient.h"
 #include "Poco/Net/PartHandler.h"
 #include "Poco/Net/StringPartSource.h"
@@ -25,6 +26,7 @@
 
 
 using Poco::Net::MailMessage;
+using Poco::Net::MailInputStream;
 using Poco::Net::MailRecipient;
 using Poco::Net::MessageHeader;
 using Poco::Net::PartHandler;
@@ -541,6 +543,42 @@ void MailMessageTest::testReadMultiPartDefaultTransferEncoding()
 }
 
 
+void MailMessageTest::testReadMultiPartInvalidContentDisposition()
+{
+	std::istringstream istr(
+		"Content-type: multipart/mixed; boundary=MIME_boundary_01234567\r\n"
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Mime-Version: 1.0\r\n"
+		"Subject: Test Message\r\n"
+		"To: John Doe <john.doe@no.where>\r\n"
+		"\r\n"
+		"\r\n"
+		"Hello World!\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: \r\n"
+		"Content-Transfer-Encoding: base64\r\n"
+		"Content-Type: application/octet-stream; name=sample\r\n"
+		"\r\n"
+		"VGhpcyBpcyBzb21lIGJpbmFyeSBkYXRhLiBSZWFsbHku\r\n"
+		"--MIME_boundary_01234567--\r\n"
+	);
+
+	MailMessage message;
+	MailInputStream mis(istr);
+	message.read(mis);
+
+	assert (message.isMultipart());
+	assert (message.parts().size() == 1);
+	assert (message.get(MailMessage::HEADER_CONTENT_TYPE) == "multipart/mixed; boundary=MIME_boundary_01234567");
+
+	assert (message.parts()[0].encoding == MailMessage::ContentTransferEncoding::ENCODING_BASE64);
+	assert (message.parts()[0].disposition == MailMessage::ContentDisposition::CONTENT_INLINE);
+	assert (message.parts()[0].pSource->headers().get(MailMessage::HEADER_CONTENT_TYPE) == "application/octet-stream; name=sample");
+}
+
+
 void MailMessageTest::testReadWriteMultiPart()
 {
 	std::string msgin(
@@ -694,6 +732,7 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPart);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartWithAttachmentNames);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartDefaultTransferEncoding);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartInvalidContentDisposition);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteMultiPart);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteMultiPartStore);
 	CppUnit_addTest(pSuite, MailMessageTest, testEncodeWord);
