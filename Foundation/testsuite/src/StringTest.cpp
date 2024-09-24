@@ -1195,14 +1195,16 @@ void StringTest::testJSONString()
 	assert (toJSON("\\", false) == "\\\\");
 	assert (toJSON("\"", false) == "\\\"");
 	assert (toJSON("/", false) == "\\/");
-	assert (toJSON("\a", false) == "\\a");
+	assert (toJSON("\a", false) == "\\u0007");
 	assert (toJSON("\b", false) == "\\b");
 	assert (toJSON("\f", false) == "\\f");
 	assert (toJSON("\n", false) == "\\n");
 	assert (toJSON("\r", false) == "\\r");
 	assert (toJSON("\t", false) == "\\t");
-	assert (toJSON("\v", false) == "\\v");
+	assert (toJSON("\v", false) == "\\u000B");
 	assert (toJSON("a", false) == "a");
+	assert (toJSON("\xD0\x82", false) == "\xD0\x82");
+ 	assert (toJSON("\xD0\x82", false, true) == "\\u0402");
 
 	// ??? on MSVC, the assert macro expansion
 	// fails to compile when this string is inline ???
@@ -1215,6 +1217,8 @@ void StringTest::testJSONString()
 	assert (toJSON("bs\b") == "\"bs\\b\"");
 	assert (toJSON("nl\n") == "\"nl\\n\"");
 	assert (toJSON("tb\t") == "\"tb\\t\"");
+	assert (toJSON("\xD0\x82", true) == "\"\xD0\x82\"");
+ 	assert (toJSON("\xD0\x82", true, true) == "\"\\u0402\"");
 
 	std::ostringstream ostr;
 	toJSON("foo\\", ostr);
@@ -1239,6 +1243,12 @@ void StringTest::testJSONString()
 	toJSON("tb\t", ostr);
 	assert(ostr.str() == "\"tb\\t\"");
 	ostr.str("");
+	toJSON("\xD0\x82", ostr);
+ 	assert(ostr.str() == "\"\xD0\x82\"");
+ 	ostr.str("");
+ 	toJSON("\xD0\x82", ostr, true, true);
+ 	assert(ostr.str() == "\"\\u0402\"");
+ 	ostr.str("");
 }
 
 
