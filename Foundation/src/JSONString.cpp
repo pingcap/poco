@@ -22,7 +22,7 @@ void toJSON(const std::string& value, std::ostream& out, bool wrap, bool escapeA
 	if (wrap) out << '"';
 	if (escapeAllUnicode)
  	{
- 		out << UTF8::escape(value.begin(), value.end());
+ 		out << UTF8::escape(value.begin(), value.end(), true);
  	}
  	else
  	{
@@ -32,7 +32,7 @@ void toJSON(const std::string& value, std::ostream& out, bool wrap, bool escapeA
  			// Forward slash isn't strictly required by JSON spec, but some parsers expect it
  			if ((*it >= 0 && *it <= 31) ||  (*it == '"') || (*it == '\\') || (*it == '/'))
  			{
- 				out << UTF8::escape(it, it+1);
+ 				out << UTF8::escape(it, it+1, true);
  			}
  			else out << *it;
  		}
@@ -47,7 +47,7 @@ std::string toJSON(const std::string& value, bool wrap, bool escapeAllUnicode)
 	if (wrap) ret.append(1, '"');
 	if (escapeAllUnicode)
  	{
- 		ret.append(UTF8::escape(value.begin(), value.end()));
+ 		ret.append(UTF8::escape(value.begin(), value.end()), true);
  	}
  	else
  	{
@@ -57,7 +57,7 @@ std::string toJSON(const std::string& value, bool wrap, bool escapeAllUnicode)
  			// Forward slash isn't strictly required by JSON spec, but some parsers expect it
  			if ((*it >= 0 && *it <= 31) ||  (*it == '"') || (*it == '\\') || (*it == '/'))
  			{
- 				ret.append(UTF8::escape(it, it+1));
+ 				ret.append(UTF8::escape(it, it+1, true));
  			}
  			else ret.append(1, *it);
  		}

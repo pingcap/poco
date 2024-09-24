@@ -26,6 +26,8 @@ public:
 
 	void testCompare();
 	void testTransform();
+	void testEscape();
+ 	void testUnescape();
 
 	void setUp();
 	void tearDown();
