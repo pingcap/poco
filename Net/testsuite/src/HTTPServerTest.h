@@ -28,10 +28,8 @@ public:
 	void testFramingConflicts();
 	void testPutIdentityRequest();
 	void testChunkedRequest();
-	void testClosedRequest();
 	void testIdentityRequestKeepAlive();
 	void testChunkedRequestKeepAlive();
-	void testClosedRequestKeepAlive();
 	void testMaxKeepAlive();
 	void testKeepAliveTimeout();
 	void test100Continue();

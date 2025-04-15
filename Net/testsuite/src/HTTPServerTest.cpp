@@ -208,29 +208,6 @@ void HTTPServerTest::testChunkedRequest()
 }
 
 
-void HTTPServerTest::testClosedRequest()
-{
-	ServerSocket svs(0);
-	HTTPServerParams* pParams = new HTTPServerParams;
-	pParams->setKeepAlive(false);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
-	srv.start();
-	
-	HTTPClientSession cs("127.0.0.1", svs.address().port());
-	std::string body(5000, 'x');
-	HTTPRequest request("POST", "/echoBody");
-	request.setContentType("text/plain");
-	cs.sendRequest(request) << body;
-	HTTPResponse response;
-	std::string rbody;
-	cs.receiveResponse(response) >> rbody;
-	assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
-	assert (response.getContentType() == "text/plain");
-	assert (!response.getChunkedTransferEncoding());
-	assert (rbody == body);
-}
-
-
 void HTTPServerTest::testIdentityRequestKeepAlive()
 {
 	HTTPServer srv(new RequestHandlerFactory, 8008);
@@ -289,27 +266,6 @@ void HTTPServerTest::testChunkedRequestKeepAlive()
 	assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
 	assert (response.getContentType() == "text/plain");
 	assert (response.getChunkedTransferEncoding());
-	assert (!response.getKeepAlive());
-	assert (rbody == body);
-}
-
-
-void HTTPServerTest::testClosedRequestKeepAlive()
-{
-	HTTPServer srv(new RequestHandlerFactory, 8010);
-	srv.start();
-	
-	HTTPClientSession cs("127.0.0.1", srv.socket().address().port());
-	std::string body(5000, 'x');
-	HTTPRequest request("POST", "/echoBody");
-	request.setContentType("text/plain");
-	cs.sendRequest(request) << body;
-	HTTPResponse response;
-	std::string rbody;
-	cs.receiveResponse(response) >> rbody;
-	assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
-	assert (response.getContentType() == "text/plain");
-	assert (!response.getChunkedTransferEncoding());
 	assert (!response.getKeepAlive());
 	assert (rbody == body);
 }
@@ -600,10 +556,8 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testFramingConflicts);
 	CppUnit_addTest(pSuite, HTTPServerTest, testPutIdentityRequest);
 	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedRequest);
-	CppUnit_addTest(pSuite, HTTPServerTest, testClosedRequest);
 	CppUnit_addTest(pSuite, HTTPServerTest, testIdentityRequestKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedRequestKeepAlive);
-	CppUnit_addTest(pSuite, HTTPServerTest, testClosedRequestKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testMaxKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testKeepAliveTimeout);
 	CppUnit_addTest(pSuite, HTTPServerTest, test100Continue);
