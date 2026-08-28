@@ -28,6 +28,22 @@ namespace Poco {
 namespace Net {
 
 
+namespace
+{
+	// RFC 2047 encoded words are a MIME construct. Decoding them in the headers
+	// that decide the message framing would let an encoded value become
+	// "chunked" after a proxy has framed the message on the undecoded one. The
+	// names are spelled out rather than taken from HTTPMessage to keep this
+	// class free of a dependency on the HTTP layer above it.
+	bool isFramingHeader(const std::string& name)
+	{
+		return Poco::icompare(name, "Transfer-Encoding") == 0 ||
+			Poco::icompare(name, "Content-Length") == 0;
+	}
+}
+
+
+
 MessageHeader::MessageHeader():
 	_fieldLimit(DFL_FIELD_LIMIT)
 {
@@ -108,7 +124,12 @@ void MessageHeader::read(std::istream& istr, RecipientList* pRecipients)
 				throw MessageException("Folded field value too long/no CRLF found");
 		}
 		Poco::trimRightInPlace(value);
-		add(name, decodeWord(value));
+		// Framing headers stay undecoded. An encoded word must not become
+		// "chunked" after a proxy has framed the message on the raw value.
+		if (!isFramingHeader(name))
+			add(name, decodeWord(value));
+		else
+			add(name, value);
 		if (pRecipients) getRecipients(name, value, pRecipients);
 		++fields;
 

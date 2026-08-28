@@ -41,6 +41,7 @@ public:
 	void testSplitParameters();
 	void testFieldLimit();
 	void testDecodeWord();
+	void testNoDecodeFramingHeaders();
 
 	void setUp();
 	void tearDown();
