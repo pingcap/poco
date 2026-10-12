@@ -158,7 +158,15 @@ public:
 		
 	const std::string& getPeerHostName() const;
 		/// Returns the peer host name.
-		
+
+	void setTunneled(bool tunneled);
+		/// Sets whether the connection is tunneled, that is, reaches the
+		/// peer host through a proxy whose address is the peer address of
+		/// the socket. Must be called before the handshake to be effective.
+
+	bool getTunneled() const;
+		/// Returns true if the connection is tunneled.
+
 	Session::Ptr currentSession();
 		/// Returns the SSL session of the current connection,
 		/// for reuse in a future connection (if session caching
@@ -190,10 +198,11 @@ protected:
 	
 	long verifyPeerCertificateImpl(const std::string& hostName);
 		/// Performs post-connect (or post-accept) peer certificate validation.
-		
+
 	static bool isLocalHost(const std::string& hostName);
-		/// Returns true iff the given host name is the local host
-		/// (either "localhost" or "127.0.0.1").
+		/// Returns true iff the given host name is "localhost"
+		/// (in any letter case) or a loopback IP address literal.
+		/// The name is not resolved.
 
 	bool mustRetry(int rc);
 		/// Returns true if the last operation should be retried,
@@ -230,6 +239,7 @@ private:
 	Context::Ptr _pContext;
 	bool _needHandshake;
 	std::string _peerHostName;
+	bool _tunneled;
 	Session::Ptr _pSession;
 	
 	friend class SecureStreamSocketImpl;
@@ -254,6 +264,18 @@ inline Context::Ptr SecureSocketImpl::context() const
 inline const std::string& SecureSocketImpl::getPeerHostName() const
 {
 	return _peerHostName;
+}
+
+
+inline void SecureSocketImpl::setTunneled(bool tunneled)
+{
+	_tunneled = tunneled;
+}
+
+
+inline bool SecureSocketImpl::getTunneled() const
+{
+	return _tunneled;
 }
 
 
