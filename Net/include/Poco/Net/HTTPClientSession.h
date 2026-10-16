@@ -318,6 +318,7 @@ private:
 	bool            _reconnect;
 	bool            _mustReconnect;
 	bool            _expectResponseBody;
+	bool            _connectRequest;
 	bool            _responseReceived;
 	Poco::SharedPtr<std::ostream> _pRequestStream;
 	Poco::SharedPtr<std::istream> _pResponseStream;
