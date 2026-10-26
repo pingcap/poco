@@ -16,6 +16,8 @@
 #include "Poco/Net/DialogSocket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Exception.h"
+#include "Poco/Stopwatch.h"
 #include "Poco/Thread.h"
 #include "Poco/ActiveMethod.h"
 #include "Poco/StreamCopier.h"
@@ -26,6 +28,8 @@ using Poco::Net::FTPClientSession;
 using Poco::Net::DialogSocket;
 using Poco::Net::SocketAddress;
 using Poco::Net::FTPException;
+using Poco::InvalidArgumentException;
+using Poco::Stopwatch;
 using Poco::ActiveMethod;
 using Poco::ActiveResult;
 using Poco::StreamCopier;
@@ -333,6 +337,40 @@ void FTPClientSessionTest::testCommands()
 }
 
 
+void FTPClientSessionTest::testCommandWithCRLF()
+{
+	DialogServer server;
+	server.addResponse("220 localhost FTP ready");
+	FTPClientSession session("127.0.0.1", server.port());
+	session.setTimeout(Poco::Timespan(5, 0));
+	login(server, session);
+
+	server.addResponse("250 CWD OK");
+	try
+	{
+		session.setWorkingDirectory("pub\r\nDELE f");
+		fail("CR LF in path - must throw");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+
+	server.clearResponses();
+	server.addResponse("221 Good Bye");
+	session.close();
+	Stopwatch sw;
+	sw.start();
+	std::string cmd = server.popCommand();
+	while (cmd != "QUIT")
+	{
+		assert (cmd.find("DELE") == std::string::npos);
+		assert (sw.elapsedSeconds() < 5);
+		if (cmd.empty()) Thread::sleep(10);
+		cmd = server.popCommand();
+	}
+}
+
+
 void FTPClientSessionTest::testDownloadPORT()
 {
 	DialogServer server;
@@ -592,6 +630,7 @@ CppUnit::Test* FTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testLoginFailed1);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testLoginFailed2);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testCommands);
+	CppUnit_addTest(pSuite, FTPClientSessionTest, testCommandWithCRLF);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testDownloadPORT);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testDownloadEPRT);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testDownloadPASV);

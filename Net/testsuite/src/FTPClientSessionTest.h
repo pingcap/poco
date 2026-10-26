@@ -39,6 +39,7 @@ public:
 	void testLoginFailed1();
 	void testLoginFailed2();
 	void testCommands();
+	void testCommandWithCRLF();
 	void testDownloadPORT();
 	void testDownloadEPRT();
 	void testDownloadPASV();
