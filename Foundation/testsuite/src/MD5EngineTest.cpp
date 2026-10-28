@@ -66,6 +66,11 @@ void MD5EngineTest::testConstantTimeEquals()
 
 	assert (DigestEngine::constantTimeEquals(d1, d2));
 	assert (!DigestEngine::constantTimeEquals(d1, d3));
+
+	assert (DigestEngine::constantTimeEquals(std::string("d41d8cd98f00b204"), std::string("d41d8cd98f00b204")));
+	assert (!DigestEngine::constantTimeEquals(std::string("d41d8cd98f00b204"), std::string("d41d8cd98f00b205")));
+	assert (!DigestEngine::constantTimeEquals(std::string("d41d8cd98f00b204"), std::string("d41d8cd98f00b20")));
+	assert (DigestEngine::constantTimeEquals(std::string(), std::string()));
 }
 
 
