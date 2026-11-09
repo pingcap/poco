@@ -145,7 +145,7 @@ option(ENABLE_CPPPARSER "Enable C++ parser" OFF)
 option(ENABLE_POCODOC "Enable Poco Documentation Generator" OFF)
 option(ENABLE_PAGECOMPILER "Enable PageCompiler" OFF)
 option(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" OFF)
-option(ENABLE_REDIS "Enable Redis" ON)
+option(ENABLE_REDIS "Enable Redis" OFF)
 
 option(ENABLE_TESTS
   "Set to OFF|ON (default is OFF) to control build of POCO tests" OFF)
