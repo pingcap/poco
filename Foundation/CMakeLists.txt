@@ -80,9 +80,12 @@ else()
 	)
 endif (POCO_UNBUNDLED_PCRE)
 
-# Bundled zlib sources have been removed.
+# Bundled zlib sources have been removed. The parent build may already
+# provide ZLIB_LIBRARIES and disable FindZLIB.
 set(POCO_UNBUNDLED_ZLIB ON CACHE BOOL "Link an external zlib" FORCE)
-find_package(ZLIB REQUIRED)
+if (NOT ZLIB_LIBRARIES)
+	find_package(ZLIB REQUIRED)
+endif ()
 set(SYSLIBS ${SYSLIBS} ${ZLIB_LIBRARIES})
 
 if(WIN32)
