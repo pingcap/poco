@@ -87,7 +87,7 @@ include(PocoMacros)
 
 # Allow enabling and disabling components
 option(ENABLE_CPPUNIT "Enable CppUnit" ON)
-option(ENABLE_XML "Enable XML" ON)
+option(ENABLE_XML "Enable XML" OFF)
 option(ENABLE_JSON "Enable JSON" ON)
 option(ENABLE_MONGODB "Enable MongoDB" ON)
 option(ENABLE_PDF "Enable PDF" OFF)
