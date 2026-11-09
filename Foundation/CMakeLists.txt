@@ -80,33 +80,10 @@ else()
 	)
 endif (POCO_UNBUNDLED_PCRE)
 
-option(POCO_UNBUNDLED_ZLIB
-  "Set to OFF|ON (default is OFF) to control linking zlib as external" ${POCO_UNBUNDLED})
-
-if (POCO_UNBUNDLED_ZLIB)
-	find_package(ZLIB)
-	set(SYSLIBS ${SYSLIBS} ${ZLIB_LIBRARIES})
-else()
-
-	# zlib
-	POCO_HEADERS( SRCS zlib
-		include/Poco/zconf.h
-		include/Poco/zlib.h
-		)
-
-	POCO_SOURCES( SRCS zlib
-		src/adler32.c
-		src/compress.c
-		src/crc32.c
-		src/deflate.c
-		src/infback.c
-		src/inffast.c
-		src/inflate.c
-		src/inftrees.c
-		src/trees.c
-		src/zutil.c
-	)
-endif (POCO_UNBUNDLED_ZLIB)
+# Bundled zlib sources have been removed.
+set(POCO_UNBUNDLED_ZLIB ON CACHE BOOL "Link an external zlib" FORCE)
+find_package(ZLIB REQUIRED)
+set(SYSLIBS ${SYSLIBS} ${ZLIB_LIBRARIES})
 
 if(WIN32)
 	set(SYSLIBS ${SYSLIBS} iphlpapi)
@@ -187,10 +164,8 @@ target_include_directories( "${LIBNAME}"
 	)
 target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
 
-if (POCO_UNBUNDLED_ZLIB)
-    target_include_directories("${LIBNAME}" PUBLIC ${ZLIB_INCLUDE_DIRS})
-    target_compile_definitions("${LIBNAME}" PUBLIC POCO_UNBUNDLED_ZLIB)
-endif ()
+target_include_directories("${LIBNAME}" PUBLIC ${ZLIB_INCLUDE_DIRS})
+target_compile_definitions("${LIBNAME}" PUBLIC POCO_UNBUNDLED_ZLIB)
 
 POCO_INSTALL("${LIBNAME}")
 POCO_GENERATE_PACKAGE("${LIBNAME}")
