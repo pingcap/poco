@@ -12,6 +12,5 @@ vc.solution.include = \
 	Mail\\Mail;\
 	Ping\\Ping;\
 	TimeServer\\TimeServer;\
-	WebSocketServer\\WebSocketServer;\
 	SMTPLogger\\SMTPLogger;\
 	ifconfig\\ifconfig
