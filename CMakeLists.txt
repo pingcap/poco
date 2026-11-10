@@ -128,11 +128,6 @@ else()
     option(ENABLE_NETSSL "Enable NetSSL" OFF)
     option(ENABLE_CRYPTO "Enable Crypto" OFF)
 endif()
-if(WIN32)
-    option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" ON)
-else()
-    set(ENABLE_NETSSL_WIN OFF)
-endif()
 option(ENABLE_DATA "Enable Data" OFF)
 option(ENABLE_DATA_SQLITE "Enable Data SQlite" OFF)
 option(ENABLE_DATA_MYSQL "Enable Data MySQL" OFF)
@@ -248,12 +243,6 @@ if(ENABLE_NET)
 endif()
 
 #NetSSL
-
-
-if(WIN32 AND ENABLE_NETSSL_WIN)
-    add_subdirectory(NetSSL_Win)
-    list(APPEND Poco_COMPONENTS "NetSSL_Win")
-endif(WIN32 AND ENABLE_NETSSL_WIN)
 
 if(ENABLE_NETSSL OR ENABLE_CRYPTO)
   if(NOT OPENSSL_FOUND)
