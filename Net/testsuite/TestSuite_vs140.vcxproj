@@ -359,7 +359,6 @@
     <ClInclude Include="src\SocketsTestSuite.h" />
     <ClInclude Include="src\SocketStreamTest.h" />
     <ClInclude Include="src\SocketTest.h" />
-    <ClInclude Include="src\SyslogTest.h" />
     <ClInclude Include="src\TCPServerTest.h" />
     <ClInclude Include="src\TCPServerTestSuite.h" />
     <ClInclude Include="src\UDPEchoServer.h" />
@@ -423,7 +422,6 @@
     <ClCompile Include="src\SocketsTestSuite.cpp" />
     <ClCompile Include="src\SocketStreamTest.cpp" />
     <ClCompile Include="src\SocketTest.cpp" />
-    <ClCompile Include="src\SyslogTest.cpp" />
     <ClCompile Include="src\TCPServerTest.cpp" />
     <ClCompile Include="src\TCPServerTestSuite.cpp" />
     <ClCompile Include="src\UDPEchoServer.cpp" />
