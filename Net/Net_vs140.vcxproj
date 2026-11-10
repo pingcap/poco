@@ -358,8 +358,6 @@
     <ClInclude Include="include\Poco\Net\QuotedPrintableEncoder.h" />
     <ClInclude Include="include\Poco\Net\RawSocket.h" />
     <ClInclude Include="include\Poco\Net\RawSocketImpl.h" />
-    <ClInclude Include="include\Poco\Net\RemoteSyslogChannel.h" />
-    <ClInclude Include="include\Poco\Net\RemoteSyslogListener.h" />
     <ClInclude Include="include\Poco\Net\ServerSocket.h" />
     <ClInclude Include="include\Poco\Net\ServerSocketImpl.h" />
     <ClInclude Include="include\Poco\Net\SMTPChannel.h" />
@@ -463,8 +461,6 @@
     <ClCompile Include="src\QuotedPrintableEncoder.cpp" />
     <ClCompile Include="src\RawSocket.cpp" />
     <ClCompile Include="src\RawSocketImpl.cpp" />
-    <ClCompile Include="src\RemoteSyslogChannel.cpp" />
-    <ClCompile Include="src\RemoteSyslogListener.cpp" />
     <ClCompile Include="src\ServerSocket.cpp" />
     <ClCompile Include="src\ServerSocketImpl.cpp" />
     <ClCompile Include="src\SMTPChannel.cpp" />

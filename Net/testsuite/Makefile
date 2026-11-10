@@ -25,7 +25,6 @@ objects = \
 	RawSocketTest ICMPClientTest ICMPSocketTest ICMPClientTestSuite \
 	NTPClientTest NTPClientTestSuite \
 	WebSocketTest WebSocketTestSuite \
-	SyslogTest \
 	OAuth10CredentialsTest OAuth20CredentialsTest OAuthTestSuite \
 	PollSetTest
 

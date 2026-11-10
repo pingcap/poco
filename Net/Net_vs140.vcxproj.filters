@@ -441,12 +441,6 @@
     <ClInclude Include="include\Poco\Net\NTPPacket.h">
       <Filter>NTP\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Poco\Net\RemoteSyslogChannel.h">
-      <Filter>Logging\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Poco\Net\RemoteSyslogListener.h">
-      <Filter>Logging\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Poco\Net\SMTPChannel.h">
       <Filter>Logging\Header Files</Filter>
     </ClInclude>
@@ -742,12 +736,6 @@
     </ClCompile>
     <ClCompile Include="src\NTPPacket.cpp">
       <Filter>NTP\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RemoteSyslogChannel.cpp">
-      <Filter>Logging\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RemoteSyslogListener.cpp">
-      <Filter>Logging\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\SMTPChannel.cpp">
       <Filter>Logging\Source Files</Filter>

@@ -1,2 +1,0 @@
-export EXCLUDE_TESTS="Data/ODBC PDF"
-
