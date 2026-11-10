@@ -29,7 +29,7 @@ objects = \
 	RawSocket RawSocketImpl ICMPClient ICMPEventArgs ICMPPacket ICMPPacketImpl \
 	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
 	NTPClient NTPEventArgs NTPPacket \
-	RemoteSyslogChannel SMTPChannel \
+	SMTPChannel \
 	WebSocket WebSocketImpl \
 	OAuth10Credentials OAuth20Credentials \
 	PollSet
