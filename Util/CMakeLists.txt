@@ -25,11 +25,7 @@ set_target_properties( "${LIBNAME}"
     )
 
 target_link_libraries( "${LIBNAME}" Foundation)
-if (ENABLE_XML)
-	target_link_libraries( "${LIBNAME}" XML)
-else ()
-	add_definitions( -DPOCO_UTIL_NO_XMLCONFIGURATION )
-endif()
+add_definitions( -DPOCO_UTIL_NO_XMLCONFIGURATION )
 if (ENABLE_JSON)
 	target_link_libraries( "${LIBNAME}" JSON)
 else ()
