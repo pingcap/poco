@@ -18,7 +18,6 @@ objects = \
 	HTTPFixedLengthStream HTTPServerRequest HTTPServerRequestImpl StreamSocketImpl \
 	HTTPHeaderStream HTTPServerResponse HTTPServerResponseImpl NameValueCollection TCPServer \
 	HTTPMessage HTTPServerSession NetException TCPServerConnection HTTPBufferAllocator \
-	HTTPAuthenticationParams HTTPCredentials HTTPDigestCredentials \
 	HTTPRequest HTTPSession NetworkInterface  \
 	HTTPRequestHandler HTTPStream ServerSocket TCPServerDispatcher TCPServerConnectionFactory \
 	HTTPRequestHandlerFactory ServerSocketImpl TCPServerParams \
@@ -26,7 +25,6 @@ objects = \
 	MailRecipient \
 	RawSocket RawSocketImpl \
 	WebSocket WebSocketImpl \
-	OAuth20Credentials \
 	PollSet
 
 target         = PocoNet

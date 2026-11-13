@@ -20,7 +20,6 @@ objects = \
 	SocketReactorTest ReactorTestSuite \
 	RawSocketTest \
 	WebSocketTest WebSocketTestSuite \
-	OAuth20CredentialsTest OAuthTestSuite \
 	PollSetTest
 
 target         = testrunner

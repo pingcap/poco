@@ -17,7 +17,6 @@
 #include "TCPServerTestSuite.h"
 #include "HTTPServerTestSuite.h"
 #include "ReactorTestSuite.h"
-#include "OAuthTestSuite.h"
 
 
 CppUnit::Test* NetTestSuite::suite()
@@ -32,7 +31,6 @@ CppUnit::Test* NetTestSuite::suite()
 	pSuite->addTest(TCPServerTestSuite::suite());
 	pSuite->addTest(HTTPServerTestSuite::suite());
 	pSuite->addTest(ReactorTestSuite::suite());
-	pSuite->addTest(OAuthTestSuite::suite());
 
 	return pSuite;
 }
