@@ -11,8 +11,6 @@
 #include "MailTestSuite.h"
 #include "MailMessageTest.h"
 #include "MailStreamTest.h"
-#include "SMTPClientSessionTest.h"
-#include "POP3ClientSessionTest.h"
 
 
 CppUnit::Test* MailTestSuite::suite()
@@ -21,8 +19,6 @@ CppUnit::Test* MailTestSuite::suite()
 
 	pSuite->addTest(MailMessageTest::suite());
 	pSuite->addTest(MailStreamTest::suite());
-	pSuite->addTest(SMTPClientSessionTest::suite());
-	pSuite->addTest(POP3ClientSessionTest::suite());
 
 	return pSuite;
 }

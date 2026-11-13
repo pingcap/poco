@@ -23,13 +23,12 @@ objects = \
 	HTTPRequestHandler HTTPStream HTTPIOStream ServerSocket TCPServerDispatcher TCPServerConnectionFactory \
 	HTTPRequestHandlerFactory HTTPStreamFactory ServerSocketImpl TCPServerParams \
 	QuotedPrintableEncoder QuotedPrintableDecoder StringPartSource \
-	FTPClientSession FTPStreamFactory PartHandler PartSource PartStore NullPartHandler \
+	PartHandler PartSource PartStore NullPartHandler \
 	SocketReactor SocketNotifier SocketNotification AbstractHTTPRequestHandler \
-	MailRecipient MailMessage MailStream SMTPClientSession POP3ClientSession \
+	MailRecipient MailMessage MailStream \
 	RawSocket RawSocketImpl ICMPClient ICMPEventArgs ICMPPacket ICMPPacketImpl \
 	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
 	NTPClient NTPEventArgs NTPPacket \
-	SMTPChannel \
 	WebSocket WebSocketImpl \
 	OAuth10Credentials OAuth20Credentials \
 	PollSet

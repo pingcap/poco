@@ -17,11 +17,9 @@ objects = \
 	HTTPServerTest MulticastEchoServer SocketAddressTest \
 	HTTPCookieTest HTTPCredentialsTest HTMLFormTest HTMLTestSuite \
 	MediaTypeTest QuotedPrintableTest DialogSocketTest \
-	HTTPClientTestSuite FTPClientTestSuite FTPClientSessionTest \
-	FTPStreamFactoryTest DialogServer \
+	HTTPClientTestSuite DialogServer \
 	SocketReactorTest ReactorTestSuite \
 	MailTestSuite MailMessageTest MailStreamTest \
-	SMTPClientSessionTest POP3ClientSessionTest \
 	RawSocketTest ICMPClientTest ICMPSocketTest ICMPClientTestSuite \
 	NTPClientTest NTPClientTestSuite \
 	WebSocketTest WebSocketTestSuite \

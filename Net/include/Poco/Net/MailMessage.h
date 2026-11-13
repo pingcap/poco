@@ -37,9 +37,8 @@ class MultipartWriter;
 
 
 class Net_API MailMessage: public MessageHeader
-	/// This class represents an e-mail message for
-	/// use with the SMTPClientSession and POPClientSession
-	/// classes.
+	/// This class represents an e-mail message.
+	/// It constructs and parses MIME mail messages.
 	///
 	/// MailMessage supports both old-style plain text messages,
 	/// as well as MIME multipart mail messages with attachments.

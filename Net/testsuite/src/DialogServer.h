@@ -24,7 +24,7 @@
 
 
 class DialogServer: public Poco::Runnable
-	/// A server for testing FTPClientSession and friends.
+	/// A server for testing line-oriented Net clients.
 {
 public:
 	DialogServer(bool acceptCommands = true);
