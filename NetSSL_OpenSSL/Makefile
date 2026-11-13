@@ -10,7 +10,7 @@ SYSLIBS += -lssl -lcrypto
 
 objects = AcceptCertificateHandler RejectCertificateHandler ConsoleCertificateHandler \
 	CertificateHandlerFactory CertificateHandlerFactoryMgr \
-	Context HTTPSClientSession HTTPSStreamFactory HTTPSSessionInstantiator \
+	Context HTTPSClientSession \
 	InvalidCertificateHandler KeyConsoleHandler \
 	KeyFileHandler PrivateKeyFactory PrivateKeyFactoryMgr \
 	PrivateKeyPassphraseHandler SecureServerSocket SecureServerSocketImpl \

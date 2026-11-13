@@ -19,9 +19,9 @@ objects = \
 	HTTPHeaderStream HTTPServerResponse HTTPServerResponseImpl NameValueCollection TCPServer \
 	HTTPMessage HTTPServerSession NetException TCPServerConnection HTTPBufferAllocator \
 	HTTPAuthenticationParams HTTPCredentials HTTPDigestCredentials \
-	HTTPRequest HTTPSession HTTPSessionInstantiator HTTPSessionFactory NetworkInterface  \
-	HTTPRequestHandler HTTPStream HTTPIOStream ServerSocket TCPServerDispatcher TCPServerConnectionFactory \
-	HTTPRequestHandlerFactory HTTPStreamFactory ServerSocketImpl TCPServerParams \
+	HTTPRequest HTTPSession NetworkInterface  \
+	HTTPRequestHandler HTTPStream ServerSocket TCPServerDispatcher TCPServerConnectionFactory \
+	HTTPRequestHandlerFactory ServerSocketImpl TCPServerParams \
 	SocketReactor SocketNotifier SocketNotification AbstractHTTPRequestHandler \
 	MailRecipient \
 	RawSocket RawSocketImpl \

@@ -8,7 +8,7 @@ include $(POCO_BASE)/build/rules/global
 
 objects = \
 	DNSTest HTTPServerTestSuite MulticastSocketTest SocketStreamTest \
-	DatagramSocketTest HTTPStreamFactoryTest SocketTest \
+	DatagramSocketTest SocketTest \
 	Driver HTTPTestServer SocketsTestSuite \
 	EchoServer HTTPTestSuite NameValueCollectionTest TCPServerTest \
 	HTTPClientSessionTest IPAddressTest NetCoreTestSuite TCPServerTestSuite \
