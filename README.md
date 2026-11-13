@@ -39,6 +39,5 @@ When contributing to POCO, please adhere to our [guidelines](https://github.com/
 
 
 All text file line endings in the repository must be Unix-style (LF).
-This includes Visual Studio project and solution files (.sln, .vcproj, .vcxproj, .vcxproj.filters).
 
 [logo]: https://raw.githubusercontent.com/pocoproject/poco/develop/doc/poco.png "Poco Layout"
