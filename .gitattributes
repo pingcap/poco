@@ -8,16 +8,11 @@
 *.c text
 *.h text
 *.cmd text
-*.sln text
-*.vcproj text
-*.vcxproj text
-*.vcxproj.filters text
 *.page text
 *.html text
 *.xhtml text
 *.css text
 *.js text
-*.progen text
 *.xml text
 *.xsd text
 *.template text
