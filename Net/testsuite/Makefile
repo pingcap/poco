@@ -16,8 +16,8 @@ objects = \
 	HTTPResponseTest MessagesTestSuite NetworkInterfaceTest \
 	HTTPServerTest MulticastEchoServer SocketAddressTest \
 	HTTPCookieTest HTTPCredentialsTest HTMLFormTest HTMLTestSuite \
-	MediaTypeTest QuotedPrintableTest DialogSocketTest \
-	HTTPClientTestSuite DialogServer \
+	MediaTypeTest QuotedPrintableTest \
+	HTTPClientTestSuite \
 	SocketReactorTest ReactorTestSuite \
 	MailTestSuite MailMessageTest MailStreamTest \
 	RawSocketTest ICMPClientTest ICMPSocketTest ICMPClientTestSuite \
