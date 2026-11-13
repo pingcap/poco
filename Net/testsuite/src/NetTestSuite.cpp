@@ -18,7 +18,6 @@
 #include "HTTPServerTestSuite.h"
 #include "HTMLTestSuite.h"
 #include "ReactorTestSuite.h"
-#include "MailTestSuite.h"
 #include "OAuthTestSuite.h"
 
 
@@ -35,7 +34,6 @@ CppUnit::Test* NetTestSuite::suite()
 	pSuite->addTest(HTTPServerTestSuite::suite());
 	pSuite->addTest(HTMLTestSuite::suite());
 	pSuite->addTest(ReactorTestSuite::suite());
-	pSuite->addTest(MailTestSuite::suite());
 	pSuite->addTest(OAuthTestSuite::suite());
 
 	return pSuite;

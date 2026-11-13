@@ -19,7 +19,6 @@ objects = \
 	MediaTypeTest QuotedPrintableTest \
 	HTTPClientTestSuite \
 	SocketReactorTest ReactorTestSuite \
-	MailTestSuite MailMessageTest MailStreamTest \
 	RawSocketTest \
 	WebSocketTest WebSocketTestSuite \
 	OAuth10CredentialsTest OAuth20CredentialsTest OAuthTestSuite \

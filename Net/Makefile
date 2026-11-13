@@ -25,7 +25,7 @@ objects = \
 	QuotedPrintableEncoder QuotedPrintableDecoder StringPartSource \
 	PartHandler PartSource PartStore NullPartHandler \
 	SocketReactor SocketNotifier SocketNotification AbstractHTTPRequestHandler \
-	MailRecipient MailMessage MailStream \
+	MailRecipient \
 	RawSocket RawSocketImpl \
 	WebSocket WebSocketImpl \
 	OAuth10Credentials OAuth20Credentials \
