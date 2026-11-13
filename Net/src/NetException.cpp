@@ -43,7 +43,6 @@ POCO_IMPLEMENT_EXCEPTION(UnsupportedRedirectException, HTTPException, "Unsupport
 POCO_IMPLEMENT_EXCEPTION(FTPException, NetException, "FTP Exception")
 POCO_IMPLEMENT_EXCEPTION(SMTPException, NetException, "SMTP Exception")
 POCO_IMPLEMENT_EXCEPTION(POP3Exception, NetException, "POP3 Exception")
-POCO_IMPLEMENT_EXCEPTION(HTMLFormException, NetException, "HTML Form Exception")
 POCO_IMPLEMENT_EXCEPTION(UnsupportedFamilyException, NetException, "Unknown or unsupported socket family")
 POCO_IMPLEMENT_EXCEPTION(AddressFamilyMismatchException, NetException, "Address family mismatch")
 

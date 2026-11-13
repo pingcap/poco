@@ -15,7 +15,6 @@
 #include "Poco/Net/AbstractHTTPRequestHandler.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
-#include "Poco/Net/HTMLForm.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Exception.h"
 
@@ -29,15 +28,13 @@ namespace Net {
 
 AbstractHTTPRequestHandler::AbstractHTTPRequestHandler():
 	_pRequest(0),
-	_pResponse(0),
-	_pForm(0)
+	_pResponse(0)
 {
 }
 
 
 AbstractHTTPRequestHandler::~AbstractHTTPRequestHandler()
 {
-	delete _pForm;
 }
 
 
@@ -76,15 +73,6 @@ void AbstractHTTPRequestHandler::handleRequest(HTTPServerRequest& request, HTTPS
 bool AbstractHTTPRequestHandler::authenticate()
 {
 	return true;
-}
-
-
-HTMLForm& AbstractHTTPRequestHandler::form()
-{
-	if (!_pForm)
-		_pForm = new HTMLForm(request(), request().stream());
-
-	return *_pForm;
 }
 
 

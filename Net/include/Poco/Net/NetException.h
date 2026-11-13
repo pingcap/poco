@@ -46,7 +46,6 @@ POCO_DECLARE_EXCEPTION(Net_API, UnsupportedRedirectException, HTTPException)
 POCO_DECLARE_EXCEPTION(Net_API, FTPException, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, SMTPException, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, POP3Exception, NetException)
-POCO_DECLARE_EXCEPTION(Net_API, HTMLFormException, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, UnsupportedFamilyException, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, AddressFamilyMismatchException, NetException)
 

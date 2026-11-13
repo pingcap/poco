@@ -11,7 +11,6 @@ projects:
 	$(MAKE) -C TimeServer $(MAKECMDGOALS)
 	$(MAKE) -C httpget $(MAKECMDGOALS)
 	$(MAKE) -C HTTPTimeServer $(MAKECMDGOALS)
-	$(MAKE) -C HTTPFormServer $(MAKECMDGOALS)
 	$(MAKE) -C HTTPLoadTest $(MAKECMDGOALS)
 	$(MAKE) -C EchoServer $(MAKECMDGOALS)
 	$(MAKE) -C WebSocketServer $(MAKECMDGOALS)

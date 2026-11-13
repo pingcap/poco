@@ -1,5 +1,4 @@
 add_subdirectory(EchoServer)
-add_subdirectory(HTTPFormServer)
 add_subdirectory(HTTPLoadTest)
 add_subdirectory(HTTPTimeServer)
 add_subdirectory(TimeServer)
