@@ -26,9 +26,7 @@ objects = \
 	PartHandler PartSource PartStore NullPartHandler \
 	SocketReactor SocketNotifier SocketNotification AbstractHTTPRequestHandler \
 	MailRecipient MailMessage MailStream \
-	RawSocket RawSocketImpl ICMPClient ICMPEventArgs ICMPPacket ICMPPacketImpl \
-	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
-	NTPClient NTPEventArgs NTPPacket \
+	RawSocket RawSocketImpl \
 	WebSocket WebSocketImpl \
 	OAuth10Credentials OAuth20Credentials \
 	PollSet

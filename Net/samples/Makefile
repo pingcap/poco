@@ -14,6 +14,5 @@ projects:
 	$(MAKE) -C HTTPFormServer $(MAKECMDGOALS)
 	$(MAKE) -C HTTPLoadTest $(MAKECMDGOALS)
 	$(MAKE) -C EchoServer $(MAKECMDGOALS)
-	$(MAKE) -C Ping $(MAKECMDGOALS)
 	$(MAKE) -C WebSocketServer $(MAKECMDGOALS)
 	$(MAKE) -C ifconfig $(MAKECMDGOALS)

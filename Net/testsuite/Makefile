@@ -20,8 +20,7 @@ objects = \
 	HTTPClientTestSuite \
 	SocketReactorTest ReactorTestSuite \
 	MailTestSuite MailMessageTest MailStreamTest \
-	RawSocketTest ICMPClientTest ICMPSocketTest ICMPClientTestSuite \
-	NTPClientTest NTPClientTestSuite \
+	RawSocketTest \
 	WebSocketTest WebSocketTestSuite \
 	OAuth10CredentialsTest OAuth20CredentialsTest OAuthTestSuite \
 	PollSetTest

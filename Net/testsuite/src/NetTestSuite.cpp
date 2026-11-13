@@ -19,8 +19,6 @@
 #include "HTMLTestSuite.h"
 #include "ReactorTestSuite.h"
 #include "MailTestSuite.h"
-#include "ICMPClientTestSuite.h"
-#include "NTPClientTestSuite.h"
 #include "OAuthTestSuite.h"
 
 
@@ -38,8 +36,6 @@ CppUnit::Test* NetTestSuite::suite()
 	pSuite->addTest(HTMLTestSuite::suite());
 	pSuite->addTest(ReactorTestSuite::suite());
 	pSuite->addTest(MailTestSuite::suite());
-	pSuite->addTest(ICMPClientTestSuite::suite());
-	pSuite->addTest(NTPClientTestSuite::suite());
 	pSuite->addTest(OAuthTestSuite::suite());
 
 	return pSuite;
