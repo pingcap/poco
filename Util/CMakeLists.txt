@@ -26,6 +26,9 @@ set_target_properties( "${LIBNAME}"
 
 target_link_libraries( "${LIBNAME}" Foundation)
 add_definitions( -DPOCO_UTIL_NO_XMLCONFIGURATION )
+if(POCO_UTIL_FINDFILE_APP_DIR_ONLY)
+	add_definitions( -DPOCO_UTIL_FINDFILE_APP_DIR_ONLY )
+endif()
 if (ENABLE_JSON)
 	target_link_libraries( "${LIBNAME}" JSON)
 else ()

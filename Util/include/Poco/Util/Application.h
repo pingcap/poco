@@ -177,10 +177,11 @@ public:
 		/// The configuration(s) will be added to the application's
 		/// LayeredConfiguration with the given priority.
 		///
-		/// The configuration file(s) must be located in the same directory
-		/// as the executable or a parent directory of it, and must have the
-		/// same base name as the executable, with one of the following extensions:
-		/// .properties, .ini or .xml.
+		/// The configuration file(s) must have the same base name as the
+		/// executable, with one of the following extensions:
+		/// .properties, .ini or .xml. findFile() looks for them in the
+		/// executable directory. Parent directories are searched only when
+		/// POCO_UTIL_FINDFILE_APP_DIR_ONLY is not defined.
 		///
 		/// The .properties file, if it exists, is loaded first, followed
 		/// by the .ini file and the .xml file.
@@ -353,7 +354,8 @@ protected:
 		/// leaves path unchanged.
 		///
 		/// If path is relative, searches for the file in the application
-		/// directory and in all subsequent parent directories.
+		/// directory. When POCO_UTIL_FINDFILE_APP_DIR_ONLY is not defined,
+		/// the search continues through parent directories.
 		/// Returns true and stores the absolute path to the file in
 		/// path if the file could be found. Returns false and leaves path
 		/// unchanged otherwise.
