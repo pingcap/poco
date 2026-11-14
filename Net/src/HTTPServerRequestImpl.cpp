@@ -19,12 +19,9 @@
 #include "Poco/Net/HTTPStream.h"
 #include "Poco/Net/HTTPFixedLengthStream.h"
 #include "Poco/Net/HTTPChunkedStream.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/Net/HTTPServerParams.h"
 #include "Poco/Net/StreamSocket.h"
-#include "Poco/String.h"
-
-
-using Poco::icompare;
 
 
 namespace Poco {
@@ -45,7 +42,14 @@ HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponseImpl& response, H
 	// Now that we know socket is still connected, obtain addresses
 	_clientAddress = session.clientAddress();
 	_serverAddress = session.serverAddress();
-	
+
+	checkFramingHeaders();
+
+	// Only "chunked" frames the body. Any other transfer coding would leave the
+	// payload in the connection to be read as the next request.
+	if (has(TRANSFER_ENCODING) && !getChunkedTransferEncoding())
+		throw MessageException("Unsupported Transfer-Encoding");
+
 	if (getChunkedTransferEncoding())
 		_pStream = new HTTPChunkedInputStream(session);
 	else if (hasContentLength())

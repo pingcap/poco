@@ -21,6 +21,8 @@
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/SocketAddress.h"
 #include "Poco/StreamCopier.h"
 #include <sstream>
 
@@ -526,11 +528,76 @@ void HTTPServerTest::tearDown()
 }
 
 
+namespace
+{
+	std::string sendRaw(Poco::UInt16 port, const std::string& request)
+	{
+		Poco::Net::StreamSocket ss(Poco::Net::SocketAddress("127.0.0.1", port));
+		ss.sendBytes(request.data(), static_cast<int>(request.size()));
+		std::string response;
+		char buffer[512];
+		try
+		{
+			int n = ss.receiveBytes(buffer, sizeof(buffer));
+			while (n > 0)
+			{
+				response.append(buffer, n);
+				if (response.find("\r\n\r\n") != std::string::npos) break;
+				n = ss.receiveBytes(buffer, sizeof(buffer));
+			}
+		}
+		catch (Poco::Exception&)
+		{
+		}
+		return response;
+	}
+}
+
+
+void HTTPServerTest::testFramingConflicts()
+{
+	ServerSocket svs(0);
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	srv.start();
+	const Poco::UInt16 port = svs.address().port();
+
+	const std::string head("POST /echoBody HTTP/1.1\r\nHost: test\r\n");
+
+	// Both framing headers present: the length is ambiguous.
+	std::string response = sendRaw(port, head +
+		"Transfer-Encoding: chunked\r\nContent-Length: 2\r\n\r\n");
+	assert (response.compare(0, 12, "HTTP/1.1 400") == 0);
+
+	response = sendRaw(port, head + "Content-Length: 2\r\nContent-Length: 3\r\n\r\nhi");
+	assert (response.compare(0, 12, "HTTP/1.1 400") == 0);
+
+	// A thousands separator must not turn 5 into 55.
+	response = sendRaw(port, head + "Content-Length: 5,5\r\n\r\nhello");
+	assert (response.compare(0, 12, "HTTP/1.1 400") == 0);
+
+	response = sendRaw(port, head + "Content-Length: 99999999999999999999\r\n\r\nhello");
+	assert (response.compare(0, 12, "HTTP/1.1 400") == 0);
+
+	// A transfer coding other than chunked does not frame the body.
+	response = sendRaw(port, head + "Transfer-Encoding: gzip, chunked\r\n\r\n");
+	assert (response.compare(0, 12, "HTTP/1.1 400") == 0);
+
+	// The unambiguous case must still be served.
+	response = sendRaw(port, head + "Content-Length: 2\r\n\r\nhi");
+	assert (response.compare(0, 12, "HTTP/1.1 200") == 0);
+
+	srv.stop();
+}
+
+
 CppUnit::Test* HTTPServerTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPServerTest");
 
 	CppUnit_addTest(pSuite, HTTPServerTest, testIdentityRequest);
+	CppUnit_addTest(pSuite, HTTPServerTest, testFramingConflicts);
 	CppUnit_addTest(pSuite, HTTPServerTest, testPutIdentityRequest);
 	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedRequest);
 	CppUnit_addTest(pSuite, HTTPServerTest, testClosedRequest);

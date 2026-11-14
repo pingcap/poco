@@ -45,6 +45,7 @@ HTTPClientSession::HTTPClientSession():
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
+	_connectRequest(false),
 	_responseReceived(false)
 {
 }
@@ -58,6 +59,7 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
+	_connectRequest(false),
 	_responseReceived(false)
 {
 }
@@ -71,6 +73,7 @@ HTTPClientSession::HTTPClientSession(const SocketAddress& address):
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
+	_connectRequest(false),
 	_responseReceived(false)
 {
 }
@@ -84,6 +87,7 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port)
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
+	_connectRequest(false),
 	_responseReceived(false)
 {
 }
@@ -97,6 +101,7 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port,
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
+	_connectRequest(false),
 	_responseReceived(false)
 {
 }
@@ -225,6 +230,7 @@ std::ostream & HTTPClientSession::sendRequest(HTTPRequest & request, HTTPSendMet
 		}
 		_reconnect = keepAlive;
 		_expectResponseBody = request.getMethod() != HTTPRequest::HTTP_HEAD;
+		_connectRequest = request.getMethod() == HTTPRequest::HTTP_CONNECT;
 
 		Poco::Timestamp sendTimestamp;
 		const std::string& method = request.getMethod();
@@ -298,7 +304,23 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 
 	_mustReconnect = getKeepAlive() && !response.getKeepAlive();
 
-	if (!_expectResponseBody || response.getStatus() < 200 || response.getStatus() == HTTPResponse::HTTP_NO_CONTENT || response.getStatus() == HTTPResponse::HTTP_NOT_MODIFIED)
+	// RFC 9112, 6.3: the framing headers of a response without a body, and of a 2xx response to CONNECT, are ignored.
+	const bool tunnelEstablished = _connectRequest && response.getStatus() >= 200 && response.getStatus() < 300;
+	const bool hasBody = _expectResponseBody && !tunnelEstablished && response.getStatus() >= 200 && response.getStatus() != HTTPResponse::HTTP_NO_CONTENT && response.getStatus() != HTTPResponse::HTTP_NOT_MODIFIED;
+	if (hasBody)
+	{
+		try
+		{
+			response.checkFramingHeaders();
+		}
+		catch (MessageException&)
+		{
+			close();
+			throw;
+		}
+	}
+
+	if (!hasBody)
 		_pResponseStream = new HTTPFixedLengthInputStream(*this, 0);
 	else if (response.getChunkedTransferEncoding())
 		_pResponseStream = new HTTPChunkedInputStream(*this);
