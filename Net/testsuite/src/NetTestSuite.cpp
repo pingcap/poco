@@ -16,13 +16,7 @@
 #include "HTTPClientTestSuite.h"
 #include "TCPServerTestSuite.h"
 #include "HTTPServerTestSuite.h"
-#include "HTMLTestSuite.h"
 #include "ReactorTestSuite.h"
-#include "FTPClientTestSuite.h"
-#include "MailTestSuite.h"
-#include "ICMPClientTestSuite.h"
-#include "NTPClientTestSuite.h"
-#include "OAuthTestSuite.h"
 
 
 CppUnit::Test* NetTestSuite::suite()
@@ -36,13 +30,7 @@ CppUnit::Test* NetTestSuite::suite()
 	pSuite->addTest(HTTPClientTestSuite::suite());
 	pSuite->addTest(TCPServerTestSuite::suite());
 	pSuite->addTest(HTTPServerTestSuite::suite());
-	pSuite->addTest(HTMLTestSuite::suite());
 	pSuite->addTest(ReactorTestSuite::suite());
-	pSuite->addTest(FTPClientTestSuite::suite());
-	pSuite->addTest(MailTestSuite::suite());
-	pSuite->addTest(ICMPClientTestSuite::suite());
-	pSuite->addTest(NTPClientTestSuite::suite());
-	pSuite->addTest(OAuthTestSuite::suite());
 
 	return pSuite;
 }

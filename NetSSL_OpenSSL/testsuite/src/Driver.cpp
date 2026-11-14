@@ -14,8 +14,6 @@
 #include "NetSSLTestSuite.h"
 #include "Poco/Path.h"
 #include "Poco/Util/Application.h"
-#include "Poco/Net/HTTPStreamFactory.h"
-#include "Poco/Net/HTTPSStreamFactory.h"
 #include <iostream>
 
 
@@ -25,8 +23,6 @@ public:
 	NetSSLApp()
 	{
 		Poco::Net::initializeSSL();
-		Poco::Net::HTTPStreamFactory::registerFactory();
-		Poco::Net::HTTPSStreamFactory::registerFactory();
 	}
 
 	~NetSSLApp()

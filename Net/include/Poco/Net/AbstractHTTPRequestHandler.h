@@ -26,19 +26,15 @@ namespace Poco {
 namespace Net {
 
 
-class HTMLForm;
-
-
 class Net_API AbstractHTTPRequestHandler: public HTTPRequestHandler
 	/// The abstract base class for AbstractHTTPRequestHandlers
 	/// created by HTTPServer.
 	///
 	/// Derived classes must override the run() method.
-
+	///
 	/// Contrary to a HTTPRequestHandler, an AbstractHTTPRequestHandler
 	/// stores request and response as member variables to avoid having
-	/// to pass them around as method parameters. Additionally, a
-	/// HTMLForm object is created for use by subclasses.
+	/// to pass them around as method parameters.
 	///
 	/// The run() method must perform the complete handling
 	/// of the HTTP request connection. As soon as the run()
@@ -72,11 +68,6 @@ public:
 	HTTPServerResponse& response();
 		/// Returns the response.
 
-	HTMLForm& form();
-		/// Returns a HTMLForm for the given request.
-		/// The HTMLForm object is created when this
-		/// member function is executed the first time.
-
 	void sendErrorResponse(HTTPResponse::HTTPStatus status, const std::string& message);
 		/// Sends a HTML error page for the given status code.
 		/// The given message is added to the page:
@@ -107,7 +98,6 @@ protected:
 private:
 	HTTPServerRequest*  _pRequest;
 	HTTPServerResponse* _pResponse;
-	HTMLForm*           _pForm;
 };
 
 

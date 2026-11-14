@@ -10,13 +10,13 @@ SYSLIBS += -lssl -lcrypto
 
 objects = AcceptCertificateHandler RejectCertificateHandler ConsoleCertificateHandler \
 	CertificateHandlerFactory CertificateHandlerFactoryMgr \
-	Context HTTPSClientSession HTTPSStreamFactory HTTPSSessionInstantiator \
+	Context HTTPSClientSession \
 	InvalidCertificateHandler KeyConsoleHandler \
 	KeyFileHandler PrivateKeyFactory PrivateKeyFactoryMgr \
 	PrivateKeyPassphraseHandler SecureServerSocket SecureServerSocketImpl \
 	SecureSocketImpl SecureStreamSocket SecureStreamSocketImpl \
 	SSLException SSLManager Utility VerificationErrorArgs \
-	X509Certificate Session SecureSMTPClientSession FTPSClientSession
+	X509Certificate Session
 
 target         = PocoNetSSL
 target_version = $(LIBVERSION)

@@ -11,27 +11,20 @@ SHAREDOPT_CXX += -DNet_EXPORTS
 objects = \
 	Net DNS HTTPResponse HostEntry Socket \
 	DatagramSocket HTTPServer IPAddress IPAddressImpl SocketAddress SocketAddressImpl \
-	HTTPBasicCredentials HTTPCookie HTMLForm MediaType DialogSocket \
-	DatagramSocketImpl FilePartSource HTTPServerConnection MessageHeader \
+	HTTPBasicCredentials HTTPCookie MediaType \
+	DatagramSocketImpl HTTPServerConnection MessageHeader \
 	HTTPChunkedStream HTTPServerConnectionFactory MulticastSocket SocketStream \
-	HTTPClientSession HTTPServerParams MultipartReader StreamSocket SocketImpl \
-	HTTPFixedLengthStream HTTPServerRequest HTTPServerRequestImpl MultipartWriter StreamSocketImpl \
+	HTTPClientSession HTTPServerParams StreamSocket SocketImpl \
+	HTTPFixedLengthStream HTTPServerRequest HTTPServerRequestImpl StreamSocketImpl \
 	HTTPHeaderStream HTTPServerResponse HTTPServerResponseImpl NameValueCollection TCPServer \
 	HTTPMessage HTTPServerSession NetException TCPServerConnection HTTPBufferAllocator \
-	HTTPAuthenticationParams HTTPCredentials HTTPDigestCredentials \
-	HTTPRequest HTTPSession HTTPSessionInstantiator HTTPSessionFactory NetworkInterface  \
-	HTTPRequestHandler HTTPStream HTTPIOStream ServerSocket TCPServerDispatcher TCPServerConnectionFactory \
-	HTTPRequestHandlerFactory HTTPStreamFactory ServerSocketImpl TCPServerParams \
-	QuotedPrintableEncoder QuotedPrintableDecoder StringPartSource \
-	FTPClientSession FTPStreamFactory PartHandler PartSource PartStore NullPartHandler \
+	HTTPRequest HTTPSession NetworkInterface  \
+	HTTPRequestHandler HTTPStream ServerSocket TCPServerDispatcher TCPServerConnectionFactory \
+	HTTPRequestHandlerFactory ServerSocketImpl TCPServerParams \
 	SocketReactor SocketNotifier SocketNotification AbstractHTTPRequestHandler \
-	MailRecipient MailMessage MailStream SMTPClientSession POP3ClientSession \
-	RawSocket RawSocketImpl ICMPClient ICMPEventArgs ICMPPacket ICMPPacketImpl \
-	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
-	NTPClient NTPEventArgs NTPPacket \
-	SMTPChannel \
+	MailRecipient \
+	RawSocket RawSocketImpl \
 	WebSocket WebSocketImpl \
-	OAuth10Credentials OAuth20Credentials \
 	PollSet
 
 target         = PocoNet

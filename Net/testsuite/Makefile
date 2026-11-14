@@ -8,24 +8,18 @@ include $(POCO_BASE)/build/rules/global
 
 objects = \
 	DNSTest HTTPServerTestSuite MulticastSocketTest SocketStreamTest \
-	DatagramSocketTest HTTPStreamFactoryTest MultipartReaderTest SocketTest \
-	Driver HTTPTestServer MultipartWriterTest SocketsTestSuite \
+	DatagramSocketTest SocketTest \
+	Driver HTTPTestServer SocketsTestSuite \
 	EchoServer HTTPTestSuite NameValueCollectionTest TCPServerTest \
 	HTTPClientSessionTest IPAddressTest NetCoreTestSuite TCPServerTestSuite \
 	HTTPRequestTest MessageHeaderTest NetTestSuite UDPEchoServer \
 	HTTPResponseTest MessagesTestSuite NetworkInterfaceTest \
 	HTTPServerTest MulticastEchoServer SocketAddressTest \
-	HTTPCookieTest HTTPCredentialsTest HTMLFormTest HTMLTestSuite \
-	MediaTypeTest QuotedPrintableTest DialogSocketTest \
-	HTTPClientTestSuite FTPClientTestSuite FTPClientSessionTest \
-	FTPStreamFactoryTest DialogServer \
+	HTTPCookieTest HTTPCredentialsTest MediaTypeTest \
+	HTTPClientTestSuite \
 	SocketReactorTest ReactorTestSuite \
-	MailTestSuite MailMessageTest MailStreamTest \
-	SMTPClientSessionTest POP3ClientSessionTest \
-	RawSocketTest ICMPClientTest ICMPSocketTest ICMPClientTestSuite \
-	NTPClientTest NTPClientTestSuite \
+	RawSocketTest \
 	WebSocketTest WebSocketTestSuite \
-	OAuth10CredentialsTest OAuth20CredentialsTest OAuthTestSuite \
 	PollSetTest
 
 target         = testrunner

@@ -1,7 +1,7 @@
 //
 // httpget.cpp
 //
-// This sample demonstrates the HTTPClientSession and the HTTPCredentials classes.
+// This sample demonstrates the HTTPClientSession class.
 //
 // Copyright (c) 2005-2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -13,7 +13,7 @@
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
-#include <Poco/Net/HTTPCredentials.h>
+#include "Poco/Net/HTTPBasicCredentials.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/NullStream.h"
 #include "Poco/Path.h"
@@ -69,15 +69,29 @@ int main(int argc, char** argv)
 
 		std::string username;
 		std::string password;
-		Poco::Net::HTTPCredentials::extractCredentials(uri, username, password);
-		Poco::Net::HTTPCredentials credentials(username, password);
+		const std::string userInfo = uri.getUserInfo();
+		const std::string::size_type pos = userInfo.find(':');
+		if (pos != std::string::npos)
+		{
+			username = userInfo.substr(0, pos);
+			password = userInfo.substr(pos + 1);
+		}
+		else
+		{
+			username = userInfo;
+		}
 
 		HTTPClientSession session(uri.getHost(), uri.getPort());
 		HTTPRequest request(HTTPRequest::HTTP_GET, path, HTTPMessage::HTTP_1_1);
 		HTTPResponse response;
 		if (!doRequest(session, request, response))
 		{
-			credentials.authenticate(request, response);
+			if (username.empty())
+			{
+				std::cerr << "Invalid username or password" << std::endl;
+				return 1;
+			}
+			Poco::Net::HTTPBasicCredentials(username, password).authenticate(request);
 			if (!doRequest(session, request, response))
 			{
 				std::cerr << "Invalid username or password" << std::endl;
