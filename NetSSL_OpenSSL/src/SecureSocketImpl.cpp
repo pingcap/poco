@@ -367,21 +367,31 @@ void SecureSocketImpl::verifyPeerCertificate(const std::string& hostName)
 long SecureSocketImpl::verifyPeerCertificateImpl(const std::string& hostName)
 {
 	Context::VerificationMode mode = _pContext->verificationMode();
-	if (mode == Context::VERIFY_NONE || !_pContext->extendedCertificateVerificationEnabled() ||
-	    (mode != Context::VERIFY_STRICT && isLocalHost(hostName)))
+	if (mode == Context::VERIFY_NONE)
 	{
 		return X509_V_OK;
 	}
 
 	X509* pCert = SSL_get_peer_certificate(_pSSL);
-	if (pCert)
+	if (pCert == nullptr)
 	{
-		X509Certificate cert(pCert);
-		if (_pContext->useAdhocVerification())
-			return _pContext->adhocVerificate(cert) ? X509_V_OK : X509_V_ERR_APPLICATION_VERIFICATION;
-		return cert.verify(hostName) ? X509_V_OK : X509_V_ERR_APPLICATION_VERIFICATION;
+		// OpenSSL does not run its verification when the peer sends no
+		// certificate. A client certificate is optional unless OpenSSL
+		// itself requires it (VERIFY_STRICT); a server without a
+		// certificate is not authenticated at all.
+		bool isServer = _pSSL != nullptr && SSL_is_server(_pSSL) == 1;
+		return isServer ? X509_V_OK : X509_V_ERR_APPLICATION_VERIFICATION;
 	}
-	else return X509_V_OK;
+	X509Certificate cert(pCert);
+
+	if (!_pContext->extendedCertificateVerificationEnabled() ||
+	   (mode != Context::VERIFY_STRICT && isLocalHost(hostName)))
+	{
+		return X509_V_OK;
+	}
+	if (_pContext->useAdhocVerification())
+		return _pContext->adhocVerificate(cert) ? X509_V_OK : X509_V_ERR_APPLICATION_VERIFICATION;
+	return cert.verify(hostName) ? X509_V_OK : X509_V_ERR_APPLICATION_VERIFICATION;
 }
 
 
