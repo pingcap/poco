@@ -90,6 +90,8 @@ option(ENABLE_CPPUNIT "Enable CppUnit" ON)
 option(ENABLE_JSON "Enable JSON" ON)
 option(ENABLE_UTIL "Enable Util" ON)
 option(ENABLE_NET "Enable Net" ON)
+option(POCO_UTIL_FINDFILE_APP_DIR_ONLY
+  "Application::findFile searches only the executable directory for a relative path" ON)
 
 # allow disabling of internally built OpenSSL# (see below for details)
 # if POCO pre-built OpenSSL directory is found, and DISABLE_INTERNAL_OPENSSL=OFF,

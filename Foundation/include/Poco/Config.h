@@ -140,6 +140,13 @@
 // #define POCO_MSVC_SECURE_WARNINGS
 
 
+// Restrict Poco::Util::Application::findFile() to the executable
+// directory when resolving a relative path. The CMake option
+// POCO_UTIL_FINDFILE_APP_DIR_ONLY defines this by default.
+// Leave that option OFF to also search parent directories.
+// #define POCO_UTIL_FINDFILE_APP_DIR_ONLY
+
+
 // No support for INI file configurations in
 // Poco::Util::Application.
 // #define POCO_UTIL_NO_INIFILECONFIGURATION

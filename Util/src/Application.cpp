@@ -469,6 +469,16 @@ bool Application::findFile(Poco::Path& path) const
 	Path appPath;
 	getApplicationPath(appPath);
 	Path base = appPath.parent();
+#ifdef POCO_UTIL_FINDFILE_APP_DIR_ONLY
+	Path p(base, path);
+	File f(p);
+	if (f.exists())
+	{
+		path = p;
+		return true;
+	}
+	return false;
+#else
 	do
 	{
 		Path p(base, path);
@@ -482,6 +492,7 @@ bool Application::findFile(Poco::Path& path) const
 	}
 	while (base.depth() > 0);
 	return false;
+#endif
 }
 
 
