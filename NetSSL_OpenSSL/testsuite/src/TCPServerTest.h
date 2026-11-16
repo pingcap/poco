@@ -29,6 +29,7 @@ public:
 	void testMultiConnections();
 	void testReuseSocket();
 	void testReuseSession();
+	void testConfigDefaultsToExtendedVerification();
 
 	void setUp();
 	void tearDown();
