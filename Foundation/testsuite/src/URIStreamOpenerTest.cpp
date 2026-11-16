@@ -221,7 +221,7 @@ void URIStreamOpenerTest::testRedirectToFileSchemeRejected()
 	TemporaryFile tempFile;
 	std::string path = tempFile.path();
 	std::ofstream ostr(path.c_str());
-	assertTrue (ostr.good());
+	assert (ostr.good());
 	ostr << "secret" << std::endl;
 	ostr.close();
 
@@ -261,8 +261,8 @@ void URIStreamOpenerTest::testRedirectToWebSchemeAllowed()
 	opener.registerStreamFactory("http", new RedirectingStreamFactory("https://localhost/target"));
 	opener.registerStreamFactory("https", new StringStreamFactory);
 	std::istream* istr = opener.open(URI("http://localhost/redirect"));
-	assertTrue (istr != nullptr);
-	assertTrue (istr->good());
+	assert (istr != 0);
+	assert (istr->good());
 	delete istr;
 }
 
