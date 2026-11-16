@@ -82,6 +82,13 @@ public:
             /// reason for the verification failure. A server that sends no
             /// certificate (anonymous cipher) is rejected with a
             /// CertificateValidationException once the handshake is complete.
+            ///
+            /// With extended certificate verification, the certificate is not
+            /// checked against the peer host name if that name is "localhost" or
+            /// a loopback IP address literal (not resolved) and the socket is
+            /// connected to a loopback address, unless SecureStreamSocket::attach()
+            /// marks the socket as tunneled, as HTTPSClientSession does for a
+            /// proxy tunnel. VERIFY_STRICT always checks the host name.
 
         VERIFY_STRICT  = SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT,
             /// Server: If the client did not return a certificate, the TLS/SSL
@@ -113,6 +120,12 @@ public:
         std::string caDefaultFile;
         std::string caLocation;
     };
+
+    static constexpr const char* DEFAULT_CIPHER_LIST = "ALL:!aNULL:!LOW:!EXP:!MD5:!3DES:!IDEA:@STRENGTH";
+        /// The default cipher list excludes the cipher suites without
+        /// authentication (anonymous DH and ECDH), which accept a server
+        /// without a certificate, and those using 3DES or IDEA. It applies
+        /// only to TLS 1.2 and earlier.
 
     struct NetSSL_API Params
     {
@@ -148,7 +161,7 @@ public:
 
         std::string cipherList;
             /// Specifies the supported ciphers in OpenSSL notation.
-            /// Defaults to "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH".
+            /// Defaults to DEFAULT_CIPHER_LIST.
 
         std::string dhParamsFile;
             /// Specifies a file containing Diffie-Hellman parameters.
@@ -174,7 +187,7 @@ public:
         VerificationMode verificationMode = VERIFY_RELAXED,
         int verificationDepth = 9,
         bool loadDefaultCAs = false,
-        const std::string& cipherList = "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+        const std::string& cipherList = DEFAULT_CIPHER_LIST);
         /// Creates a Context.
         ///
         ///   * usage specifies whether the context is used by a client or server.
@@ -202,7 +215,7 @@ public:
         VerificationMode verificationMode = VERIFY_RELAXED,
         int verificationDepth = 9,
         bool loadDefaultCAs = false,
-        const std::string& cipherList = "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+        const std::string& cipherList = DEFAULT_CIPHER_LIST);
         /// Creates a Context.
         ///
         ///   * usage specifies whether the context is used by a client or server.

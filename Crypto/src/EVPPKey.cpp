@@ -160,7 +160,7 @@ void EVPPKey::save(const std::string& publicKeyFile,
 				}
 				else
 				{
-					rc = PEM_write_bio_PrivateKey(bio, _pEVPPKey, EVP_des_ede3_cbc(),
+					rc = PEM_write_bio_PrivateKey(bio, _pEVPPKey, EVP_aes_256_cbc(),
 						reinterpret_cast<unsigned char*>(const_cast<char*>(privateKeyPassphrase.c_str())),
 						static_cast<int>(privateKeyPassphrase.length()), 0, 0);
 				}
@@ -206,7 +206,7 @@ void EVPPKey::save(std::ostream* pPublicKeyStream,
 		if (privateKeyPassphrase.empty())
 			rc = PEM_write_bio_PrivateKey(bio, _pEVPPKey, 0, 0, 0, 0, 0);
 		else
-			rc = PEM_write_bio_PrivateKey(bio, _pEVPPKey, EVP_des_ede3_cbc(),
+			rc = PEM_write_bio_PrivateKey(bio, _pEVPPKey, EVP_aes_256_cbc(),
 				reinterpret_cast<unsigned char*>(const_cast<char*>(privateKeyPassphrase.c_str())),
 				static_cast<int>(privateKeyPassphrase.length()), 0, 0);
 		if (!rc)
