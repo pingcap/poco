@@ -37,6 +37,10 @@ HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponseImpl& response, H
 	response.attachRequest(this);
 
 	HTTPHeaderInputStream hs(session);
+	// Reject request header field names that are not RFC 9110 tokens:
+	// white space or a control character in a name would hide a framing
+	// header ("Transfer-Encoding\t:") from every length-sensitive lookup.
+	setStrictParsing(true);
 	read(hs);
 	
 	// Now that we know socket is still connected, obtain addresses

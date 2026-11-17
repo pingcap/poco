@@ -97,6 +97,19 @@ public:
 		/// See MessageHeader::read(std::istream&) documentation
 		/// for detailed description.
 
+	void setStrictParsing(bool strict);
+		/// Enables or disables strict parsing in read().
+		///
+		/// In strict mode, read() throws a MessageException if a field
+		/// name is not a token as defined in RFC 9110, and removes only
+		/// spaces and horizontal tabs before and after a field value.
+		///
+		/// Strict parsing is disabled by default. The HTTP server
+		/// enables it for requests.
+
+	bool getStrictParsing() const;
+		/// Returns true if strict parsing is enabled.
+
 	int getFieldLimit() const;
 		/// Returns the maximum number of header fields
 		/// allowed.
@@ -160,6 +173,11 @@ public:
 		/// Decode RFC2047 string.
 
 
+protected:
+	static bool isValidFieldName(const std::string& name);
+		/// Returns true if name is a token as defined in RFC 9110.
+
+
 private:
 	static void getRecipients(const std::string& name, const std::string& value, RecipientList* pRecipients);
 		/// Returns the list of email recipients if pRecipients is not null and To, CC or BCC headers are
@@ -174,6 +192,7 @@ private:
 	};
 	
 	int _fieldLimit;
+	bool _strictParsing;
 };
 
 
