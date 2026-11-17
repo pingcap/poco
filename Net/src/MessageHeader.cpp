@@ -22,6 +22,8 @@
 #include "Poco/Base64Decoder.h"
 #include "Poco/UTF8Encoding.h"
 #include <sstream>
+#include <algorithm>
+#include <string_view>
 
 
 namespace Poco {
@@ -45,14 +47,16 @@ namespace
 
 
 MessageHeader::MessageHeader():
-	_fieldLimit(DFL_FIELD_LIMIT)
+	_fieldLimit(DFL_FIELD_LIMIT),
+	_strictParsing(false)
 {
 }
 
 
 MessageHeader::MessageHeader(const MessageHeader& messageHeader):
 	NameValueCollection(messageHeader),
-	_fieldLimit(DFL_FIELD_LIMIT)
+	_fieldLimit(DFL_FIELD_LIMIT),
+	_strictParsing(false)
 {
 }
 
@@ -104,10 +108,18 @@ void MessageHeader::read(std::istream& istr, RecipientList* pRecipients)
 		name.clear();
 		value.clear();
 		while (ch != eof && ch != ':' && ch != '\n' && name.length() < MAX_NAME_LENGTH) { name += ch; ch = buf.sbumpc(); }
-		if (ch == '\n') { ch = buf.sbumpc(); continue; } // ignore invalid header lines
+		if (ch == '\n') { ch = buf.sbumpc(); ++fields; continue; } // ignore invalid header lines (count towards the field limit)
 		if (ch != ':') throw MessageException("Field name too long/no colon found");
+		// White space or a control character in a name would hide a header
+		// such as "Content-Length : 5" from a lookup by name, while a front
+		// end may still frame the message on it.
+		if (_strictParsing && !isValidFieldName(name))
+			throw MessageException("Invalid character in header field name");
 		if (ch != eof) ch = buf.sbumpc(); // ':'
-		while (ch != eof && Poco::Ascii::isSpace(ch) && ch != '\r' && ch != '\n') ch = buf.sbumpc();
+		if (_strictParsing)
+			while (ch == ' ' || ch == '\t') ch = buf.sbumpc();
+		else
+			while (ch != eof && Poco::Ascii::isSpace(ch) && ch != '\r' && ch != '\n') ch = buf.sbumpc();
 		while (ch != eof && ch != '\r' && ch != '\n' && value.length() < MAX_VALUE_LENGTH) { value += ch; ch = buf.sbumpc(); }
 		if (ch == '\r') ch = buf.sbumpc();
 		if (ch == '\n')
@@ -123,7 +135,10 @@ void MessageHeader::read(std::istream& istr, RecipientList* pRecipients)
 			else if (ch != eof)
 				throw MessageException("Folded field value too long/no CRLF found");
 		}
-		Poco::trimRightInPlace(value);
+		if (_strictParsing)
+			value.erase(value.find_last_not_of(" \t") + 1);
+		else
+			Poco::trimRightInPlace(value);
 		// Framing headers stay undecoded. An encoded word must not become
 		// "chunked" after a proxy has framed the message on the raw value.
 		if (!isFramingHeader(name))
@@ -474,6 +489,26 @@ std::string MessageHeader::decodeWord(const std::string& text, const std::string
 	} while (true);
 
 	return outs;
+}
+
+
+void MessageHeader::setStrictParsing(bool strict)
+{
+	_strictParsing = strict;
+}
+
+
+bool MessageHeader::getStrictParsing() const
+{
+	return _strictParsing;
+}
+
+
+bool MessageHeader::isValidFieldName(const std::string& name)
+{
+	static constexpr std::string_view tokenPunct("!#$%&\'*+-.^_`|~");
+	return !name.empty() && std::all_of(name.begin(), name.end(),
+		[](char c) { return Poco::Ascii::isAlphaNumeric(c) || tokenPunct.find(c) != std::string_view::npos; });
 }
 
 
