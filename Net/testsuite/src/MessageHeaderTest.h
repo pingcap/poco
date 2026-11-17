@@ -42,6 +42,9 @@ public:
 	void testFieldLimit();
 	void testDecodeWord();
 	void testNoDecodeFramingHeaders();
+	void testStrictFieldName();
+	void testStrictValueWhitespace();
+	void testFieldLimitLinesWithoutColon();
 
 	void setUp();
 	void tearDown();

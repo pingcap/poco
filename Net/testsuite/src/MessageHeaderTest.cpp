@@ -387,6 +387,83 @@ void MessageHeaderTest::tearDown()
 }
 
 
+void MessageHeaderTest::testStrictFieldName()
+{
+	const std::string invalid[] = {
+		"Content-Length : 5\r\n\r\n",
+		"Transfer-Encoding\t: chunked\r\n\r\n",
+		"Content-Length\r: 5\r\n\r\n",
+		"Na\x01me: value\r\n\r\n",
+		"N\xC3\xA4me: value\r\n\r\n",
+		"X(a): value\r\n\r\n",
+		"X/a: value\r\n\r\n",
+		": value\r\n\r\n"
+	};
+	for (const auto& s: invalid)
+	{
+		std::istringstream istr(s);
+		MessageHeader mh;
+		mh.setStrictParsing(true);
+		try
+		{
+			mh.read(istr);
+			fail("invalid field name must throw: " + s);
+		}
+		catch (MessageException&)
+		{
+		}
+	}
+
+	std::istringstream istr("Content-Length: 5\r\nX-Name_1.~!#$%&'*+^`|: value\r\n\r\n");
+	MessageHeader mh;
+	mh.setStrictParsing(true);
+	mh.read(istr);
+	assert (mh.size() == 2);
+	assert (mh.get("Content-Length") == "5");
+	assert (mh.get("X-Name_1.~!#$%&'*+^`|") == "value");
+
+	std::istringstream lenient("Content-Length : 5\r\n\r\n");
+	MessageHeader mhLenient;
+	mhLenient.read(lenient);
+	assert (mhLenient.get("Content-Length ") == "5");
+}
+
+
+void MessageHeaderTest::testStrictValueWhitespace()
+{
+	std::istringstream istr("Transfer-Encoding:\vchunked\r\nContent-Length: \t5\f \r\n\r\n");
+	MessageHeader mh;
+	mh.setStrictParsing(true);
+	mh.read(istr);
+	assert (mh.get("Transfer-Encoding") == "\vchunked");
+	assert (mh.get("Content-Length") == "5\f");
+
+	std::istringstream lenient("Transfer-Encoding:\vchunked\r\nContent-Length: \t5\f \r\n\r\n");
+	MessageHeader mhLenient;
+	mhLenient.read(lenient);
+	assert (mhLenient.get("Transfer-Encoding") == "chunked");
+	assert (mhLenient.get("Content-Length") == "5");
+}
+
+
+void MessageHeaderTest::testFieldLimitLinesWithoutColon()
+{
+	std::string s;
+	for (int i = 0; i < 200; ++i) s += "x\r\n";
+	s += "name: value\r\n\r\n";
+	std::istringstream istr(s);
+	MessageHeader mh;
+	try
+	{
+		mh.read(istr);
+		fail("Field limit exceeded - must throw");
+	}
+	catch (MessageException&)
+	{
+	}
+}
+
+
 void MessageHeaderTest::testNoDecodeFramingHeaders()
 {
 	// Auto-decoding must not reach the headers that decide the framing,
@@ -426,6 +503,9 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testFieldLimit);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeWord);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testNoDecodeFramingHeaders);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testStrictFieldName);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testStrictValueWhitespace);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testFieldLimitLinesWithoutColon);
 
 	return pSuite;
 }
