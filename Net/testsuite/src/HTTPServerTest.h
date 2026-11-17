@@ -37,6 +37,9 @@ public:
 	void testAuth();
 	void testNotImpl();
 	void testBuffer();
+	void testRedirectLineBreak();
+	void testSendLineBreak();
+	void testEchoDecodedLineBreak();
 
 	void setUp();
 	void tearDown();

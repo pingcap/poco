@@ -39,6 +39,7 @@ public:
 	void testBypassProxy();
 	void testExpectContinue();
 	void testExpectContinueFail();
+	void testInvalidRequestKeepsConnection();
 
 	void setUp();
 	void tearDown();
