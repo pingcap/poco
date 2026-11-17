@@ -28,6 +28,7 @@
 #include "Poco/FileStream.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
+#include <memory>
 
 
 using Poco::File;
@@ -101,9 +102,10 @@ std::ostream& HTTPServerResponseImpl::send()
 	}
 	else
 	{
-		_pStream = new HTTPOutputStream(_session);
 		setKeepAlive(false);
-		write(*_pStream);
+		HTTPHeaderOutputStream hs(_session);
+		write(hs);
+		_pStream = new HTTPOutputStream(_session);
 	}
 	return *_pStream;
 }
@@ -164,8 +166,10 @@ void HTTPServerResponseImpl::sendFile(const std::string& path, const std::string
 	Poco::FileInputStream istr(path);
 	if (istr.good())
 	{
-		_pStream = new HTTPHeaderOutputStream(_session);
-		write(*_pStream);
+		// _pStream is set only after write() succeeded, so that an invalid header leaves sent() false.
+		std::unique_ptr<std::ostream> pStream = std::make_unique<HTTPHeaderOutputStream>(_session);
+		write(*pStream);
+		_pStream = pStream.release();
 		if (_pRequest && _pRequest->getMethod() != HTTPRequest::HTTP_HEAD)
 		{
 			StreamCopier::copyStream(istr, *_pStream);
@@ -182,8 +186,9 @@ void HTTPServerResponseImpl::sendBuffer(const void* pBuffer, std::size_t length)
 	setContentLength(static_cast<int>(length));
 	setChunkedTransferEncoding(false);
 	
-	_pStream = new HTTPHeaderOutputStream(_session);
-	write(*_pStream);
+	std::unique_ptr<std::ostream> pStream = std::make_unique<HTTPHeaderOutputStream>(_session);
+	write(*pStream);
+	_pStream = pStream.release();
 	if (_pRequest && _pRequest->getMethod() != HTTPRequest::HTTP_HEAD)
 	{
 		_pStream->write(static_cast<const char*>(pBuffer), static_cast<std::streamsize>(length));
@@ -201,8 +206,9 @@ void HTTPServerResponseImpl::redirect(const std::string& uri, HTTPStatus status)
 	setStatusAndReason(status);
 	set("Location", uri);
 
-	_pStream = new HTTPHeaderOutputStream(_session);
-	write(*_pStream);
+	std::unique_ptr<std::ostream> pStream = std::make_unique<HTTPHeaderOutputStream>(_session);
+	write(*pStream);
+	_pStream = pStream.release();
 }
 
 

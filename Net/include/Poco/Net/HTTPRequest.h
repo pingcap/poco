@@ -126,9 +126,17 @@ public:
 		/// Sets the proxy authentication scheme and information for
 		/// this request.
 
+	void validate() const;
+		/// Throws a MessageException if the method, the URI or the
+		/// version contains a control character, or a header field
+		/// is invalid (see HTTPMessage::write()).
+
 	void write(std::ostream& ostr) const;
 		/// Writes the HTTP request to the given
 		/// output stream.
+		///
+		/// Throws a MessageException, before anything is written,
+		/// if validate() does.
 
 #if __clang__
 #pragma clang diagnostic push

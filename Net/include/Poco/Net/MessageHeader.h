@@ -72,6 +72,13 @@ public:
 		/// name and value separated by a colon and lines
 		/// delimited by a carriage return and a linefeed
 		/// character. See RFC 2822 for details.
+		///
+		/// Throws a MessageException, before anything is written,
+		/// if a field name is empty or contains a character that is not
+		/// printable ASCII, a space or a colon (RFC 5322), or a field
+		/// value contains a control character other than a horizontal tab.
+		/// A carriage return and a linefeed followed by spaces or horizontal
+		/// tabs and then other text are allowed and fold the value.
 
 	virtual void read(std::istream& istr);
 		/// Reads the message header from the given input stream.
@@ -176,6 +183,18 @@ public:
 protected:
 	static bool isValidFieldName(const std::string& name);
 		/// Returns true if name is a token as defined in RFC 9110.
+
+	static bool isInvalidValueChar(char c);
+		/// Returns true if c is a control character other than
+		/// a horizontal tab.
+
+	static void checkFields(const NameValueCollection& fields, bool allowFolding);
+		/// Throws a MessageException if a field cannot be written.
+		/// If allowFolding is true, the rules of write() apply; otherwise
+		/// those of HTTPMessage::write().
+
+	static void writeFields(const NameValueCollection& fields, std::ostream& ostr);
+		/// Writes the fields without checking them; see checkFields().
 
 
 private:

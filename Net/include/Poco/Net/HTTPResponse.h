@@ -181,6 +181,11 @@ public:
 	void write(std::ostream& ostr) const;
 		/// Writes the HTTP response to the given
 		/// output stream.
+		///
+		/// Throws a MessageException, before anything is written,
+		/// if the reason phrase contains a control character other
+		/// than a horizontal tab, or a header field is invalid
+		/// (see HTTPMessage::write()).
 
 	void beginWrite(std::ostream& ostr) const;
 		/// Writes the HTTP response to the given
