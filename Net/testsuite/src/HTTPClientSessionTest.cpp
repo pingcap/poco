@@ -14,6 +14,9 @@
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/StreamSocket.h"
 #include "Poco/StreamCopier.h"
 #include "HTTPTestServer.h"
 #include <istream>
@@ -25,6 +28,10 @@ using Poco::Net::HTTPClientSession;
 using Poco::Net::HTTPRequest;
 using Poco::Net::HTTPResponse;
 using Poco::Net::HTTPMessage;
+using Poco::Net::MessageException;
+using Poco::Net::ServerSocket;
+using Poco::Net::StreamSocket;
+using Poco::Net::SocketAddress;
 using Poco::StreamCopier;
 
 
@@ -349,6 +356,44 @@ void HTTPClientSessionTest::tearDown()
 }
 
 
+void HTTPClientSessionTest::testInvalidRequestKeepsConnection()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(request);
+	StreamSocket connection = server.acceptConnection();
+	connection.setReceiveTimeout(Poco::Timespan(10, 0));
+	const std::string valid("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nfresh");
+	connection.sendBytes(valid.data(), static_cast<int>(valid.size()));
+	HTTPResponse response;
+	std::istream& rs = cs.receiveResponse(response);
+	std::string body;
+	StreamCopier::copyToString(rs, body);
+	char buffer[1024];
+	assert (connection.receiveBytes(buffer, sizeof(buffer)) > 0);
+
+	HTTPRequest invalid(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	invalid.set("X-Field", "a\r\nX-Injected: 1");
+	try
+	{
+		cs.sendRequest(invalid);
+		fail("invalid request must throw");
+	}
+	catch (MessageException&)
+	{
+	}
+	assert (cs.connected());
+
+	cs.sendRequest(request).flush();
+	const int n = connection.receiveBytes(buffer, sizeof(buffer));
+	assert (n > 0);
+	assert (std::string(buffer, n).compare(0, 15, "GET / HTTP/1.1\r") == 0);
+}
+
+
 CppUnit::Test* HTTPClientSessionTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPClientSessionTest");
@@ -368,6 +413,7 @@ CppUnit::Test* HTTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testBypassProxy);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testExpectContinue);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testExpectContinueFail);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testInvalidRequestKeepsConnection);
 
 	return pSuite;
 }

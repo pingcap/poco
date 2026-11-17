@@ -24,7 +24,10 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/Net/NetException.h"
+#include <optional>
 #include <sstream>
+#include <csignal>
 
 
 using Poco::Net::HTTPServer;
@@ -86,6 +89,36 @@ namespace
 		}
 	};
 
+	class LineBreakRedirectRequestHandler: public AbstractHTTPRequestHandler
+	{
+	public:
+		void run()
+		{
+			response().redirect("/target\r\nSet-Cookie: injected=1");
+		}
+	};
+
+	class LineBreakSendRequestHandler: public AbstractHTTPRequestHandler
+	{
+	public:
+		void run()
+		{
+			response().set("X-Field", "a\r\nSet-Cookie: injected=1");
+			response().send();
+		}
+	};
+
+	class EchoFieldRequestHandler: public HTTPRequestHandler
+	{
+	public:
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+		{
+			response.set("X-Echo", request.get("X-Echo", ""));
+			response.setContentLength(0);
+			response.send();
+		}
+	};
+
 	class AuthRequestHandler: public HTTPRequestHandler
 	{
 	public:
@@ -117,6 +150,12 @@ namespace
 				return new EchoHeaderRequestHandler;
 			else if (request.getURI() == "/redirect")
 				return new RedirectRequestHandler();
+			else if (request.getURI() == "/lineBreakRedirect")
+				return new LineBreakRedirectRequestHandler;
+			else if (request.getURI() == "/lineBreakSend")
+				return new LineBreakSendRequestHandler;
+			else if (request.getURI() == "/echoField")
+				return new EchoFieldRequestHandler;
 			else if (request.getURI() == "/auth")
 				return new AuthRequestHandler();
 			else if (request.getURI() == "/buffer")
@@ -125,6 +164,68 @@ namespace
 				return 0;
 		}
 	};
+
+	std::optional<std::string> receiveUntilClosed(Poco::Net::StreamSocket& ss)
+		/// Returns everything received until the server closes the connection, or
+		/// nothing if the connection is still open when the receive timeout expires.
+	{
+		std::string response;
+		char buffer[1024];
+		try
+		{
+			int n = ss.receiveBytes(buffer, sizeof(buffer));
+			while (n > 0)
+			{
+				response.append(buffer, n);
+				n = ss.receiveBytes(buffer, sizeof(buffer));
+			}
+		}
+		catch (Poco::Net::NetException&)
+		{
+			// A server that closes the connection with unread data resets or aborts it.
+		}
+		catch (Poco::TimeoutException&)
+		{
+			return std::nullopt;
+		}
+		return response;
+	}
+
+	std::optional<std::string> exchangeUntilClosed(HTTPServerParams* pParams, const std::string& request, bool shutdownSend)
+		/// Starts a server with the given parameters, sends the request on a new connection,
+		/// shuts down its sending side if shutdownSend is true and returns what receiveUntilClosed() returns.
+		/// A send that fails because the server closed the connection is not an error;
+		/// a send that times out returns nothing.
+	{
+		// The server writes the error response for the failed request after the client
+		// has seen the end of the preceding response; a write to the connection the
+		// client has already closed must not kill the test process with SIGPIPE.
+		__sighandler_t pOldSigPipeHandler = signal(SIGPIPE, SIG_IGN);
+		ServerSocket svs(Poco::Net::SocketAddress("127.0.0.1", 0));
+		HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+		srv.start();
+
+		Poco::Net::StreamSocket ss(Poco::Net::SocketAddress("127.0.0.1", svs.address().port()));
+		ss.setReceiveTimeout(Poco::Timespan(10, 0));
+		ss.setSendTimeout(Poco::Timespan(10, 0));
+		try
+		{
+			ss.sendBytes(request.data(), static_cast<int>(request.size()));
+			if (shutdownSend) ss.shutdownSend();
+		}
+		catch (Poco::TimeoutException&)
+		{
+			return std::nullopt;
+		}
+		catch (Poco::IOException&)
+		{
+		}
+		const std::optional<std::string> result = receiveUntilClosed(ss);
+		srv.stop();
+		signal(SIGPIPE, pOldSigPipeHandler);
+		return result;
+	}
+
 }
 
 
@@ -548,6 +649,43 @@ void HTTPServerTest::testFramingConflicts()
 }
 
 
+void HTTPServerTest::testRedirectLineBreak()
+{
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+	const std::optional<std::string> response = exchangeUntilClosed(pParams,
+		"GET /lineBreakRedirect HTTP/1.1\r\nHost: test\r\n\r\n", false);
+	assert (response.has_value());
+	assert (response->compare(0, 12, "HTTP/1.1 500") == 0);
+	assert (response->find("injected") == std::string::npos);
+}
+
+
+void HTTPServerTest::testSendLineBreak()
+{
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+	const std::optional<std::string> response = exchangeUntilClosed(pParams,
+		"GET /lineBreakSend HTTP/1.1\r\nHost: test\r\n\r\n", false);
+	assert (response.has_value());
+	assert (response->compare(0, 12, "HTTP/1.1 500") == 0);
+	assert (response->find("injected") == std::string::npos);
+}
+
+
+void HTTPServerTest::testEchoDecodedLineBreak()
+{
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+	const std::optional<std::string> response = exchangeUntilClosed(pParams,
+		"GET /echoField HTTP/1.1\r\nHost: test\r\nX-Echo: =?UTF-8?Q?x=0D=0ASet-Cookie:_injected=1?=\r\n\r\n", false);
+	assert (response.has_value());
+	assert (response->compare(0, 12, "HTTP/1.1 200") == 0);
+	assert (response->find("\r\nX-Echo: =?UTF-8?Q?x=0D=0ASet-Cookie:_injected=1?=\r\n") != std::string::npos);
+	assert (response->find("\r\nSet-Cookie") == std::string::npos);
+}
+
+
 CppUnit::Test* HTTPServerTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPServerTest");
@@ -565,6 +703,9 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testAuth);
 	CppUnit_addTest(pSuite, HTTPServerTest, testNotImpl);
 	CppUnit_addTest(pSuite, HTTPServerTest, testBuffer);
+	CppUnit_addTest(pSuite, HTTPServerTest, testRedirectLineBreak);
+	CppUnit_addTest(pSuite, HTTPServerTest, testSendLineBreak);
+	CppUnit_addTest(pSuite, HTTPServerTest, testEchoDecodedLineBreak);
 
 	return pSuite;
 }

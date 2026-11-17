@@ -45,6 +45,10 @@ public:
 	void testStrictFieldName();
 	void testStrictValueWhitespace();
 	void testFieldLimitLinesWithoutColon();
+	void testWriteInvalidFieldValue();
+	void testWriteInvalidFieldName();
+	void testWriteValidFields();
+	void testReadDecodedControlCharacters();
 
 	void setUp();
 	void tearDown();
