@@ -9,8 +9,8 @@
 
 
 #include "MessageHeaderTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
 #include <sstream>

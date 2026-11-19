@@ -11,8 +11,8 @@
 
 
 #include "X509CertificateTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/Net/X509Certificate.h"
 #include <openssl/opensslv.h>
 #include <sstream>

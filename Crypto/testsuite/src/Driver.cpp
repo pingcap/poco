@@ -10,7 +10,7 @@
 //
 
 
-#include "Poco/CppUnit/TestRunner.h"
+#include "CppUnit/TestRunner.h"
 #include "CryptoTestSuite.h"
 #include "Poco/Crypto/Crypto.h"
 

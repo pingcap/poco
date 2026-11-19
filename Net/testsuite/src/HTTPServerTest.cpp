@@ -9,8 +9,8 @@
 
 
 #include "HTTPServerTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/Net/HTTPServer.h"
 #include "Poco/Net/HTTPServerParams.h"
 #include "Poco/Net/AbstractHTTPRequestHandler.h"

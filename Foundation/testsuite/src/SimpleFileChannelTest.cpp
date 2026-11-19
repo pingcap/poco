@@ -17,8 +17,8 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/AutoPtr.h"
 #include "SimpleFileChannelTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 
 
 using Poco::SimpleFileChannel;

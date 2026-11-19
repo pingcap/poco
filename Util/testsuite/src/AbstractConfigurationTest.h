@@ -15,7 +15,7 @@
 
 
 #include "Poco/Util/Util.h"
-#include "Poco/CppUnit/TestCase.h"
+#include "CppUnit/TestCase.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Util/AbstractConfiguration.h"
 

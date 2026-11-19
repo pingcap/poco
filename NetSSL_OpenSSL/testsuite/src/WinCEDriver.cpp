@@ -10,7 +10,7 @@
 //
 
 
-#include "Poco/CppUnit/TestRunner.h"
+#include "CppUnit/TestRunner.h"
 #include "NetSSLTestSuite.h"
 #include "Poco/Util/Application.h"
 #include <cstdlib>

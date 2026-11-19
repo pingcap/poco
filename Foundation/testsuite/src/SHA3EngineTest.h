@@ -13,7 +13,7 @@
 #define SHA3EngineTest_INCLUDED
 
 #include "Poco/Foundation.h"
-#include "Poco/CppUnit/TestCase.h"
+#include "CppUnit/TestCase.h"
 
 class SHA3EngineTest: public CppUnit::TestCase
 {

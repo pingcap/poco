@@ -17,7 +17,7 @@
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Dynamic/VarIterator.h"
 #include "Poco/Exception.h"
-#include "Poco/CppUnit/TestCase.h"
+#include "CppUnit/TestCase.h"
 
 
 class VarTest: public CppUnit::TestCase

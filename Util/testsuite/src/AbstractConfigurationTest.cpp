@@ -9,7 +9,7 @@
 
 
 #include "AbstractConfigurationTest.h"
-#include "Poco/CppUnit/TestCaller.h"
+#include "CppUnit/TestCaller.h"
 #include "Poco/Util/MapConfiguration.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"

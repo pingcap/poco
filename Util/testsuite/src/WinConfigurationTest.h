@@ -15,7 +15,7 @@
 
 
 #include "Poco/Util/Util.h"
-#include "Poco/CppUnit/TestCase.h"
+#include "CppUnit/TestCase.h"
 
 
 class WinConfigurationTest: public CppUnit::TestCase

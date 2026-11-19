@@ -14,8 +14,8 @@
 #ifdef POCO_NET_HAS_INTERFACE
 
 
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/Net/NetworkInterface.h"
 #include "Poco/Net/IPAddress.h"
 #include <iostream>

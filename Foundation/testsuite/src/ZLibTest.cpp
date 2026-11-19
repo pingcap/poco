@@ -9,8 +9,8 @@
 
 
 #include "ZLibTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/InflatingStream.h"
 #include "Poco/DeflatingStream.h"
 #include "Poco/MemoryStream.h"
