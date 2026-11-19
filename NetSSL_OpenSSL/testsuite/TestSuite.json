@@ -1,0 +1,44 @@
+{
+	"openSSL": {
+		"server": {
+			"privateKeyFile": "${application.configDir}any.pem",
+			"caConfig": "${application.configDir}rootcert.pem",
+			"verificationMode": "none",
+			"verificationDepth": 9,
+			"loadDefaultCAFile": true,
+			"privateKeyPassphraseHandler": {
+				"name": "KeyFileHandler",
+				"options": {
+					"password": "secret"
+				}
+			},
+			"invalidCertificateHandler": {
+				"name": "AcceptCertificateHandler",
+				"options": {}
+			}
+		},
+		"client": {
+			"privateKeyFile": "${application.configDir}any.pem",
+			"caConfig": "${application.configDir}rootcert.pem",
+			"verificationMode": "relaxed",
+			"verificationDepth": 9,
+			"loadDefaultCAFile": true,
+			"privateKeyPassphraseHandler": {
+				"name": "KeyFileHandler",
+				"options": {
+					"password": "secret"
+				}
+			},
+			"invalidCertificateHandler": {
+				"name": "AcceptCertificateHandler",
+				"options": {}
+			}
+		}
+	},
+	"testsuite": {
+		"proxy": {
+			"host": "proxy.aon.at",
+			"port": 8080
+		}
+	}
+}
