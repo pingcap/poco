@@ -47,7 +47,7 @@ std::string toJSON(const std::string& value, bool wrap, bool escapeAllUnicode)
 	if (wrap) ret.append(1, '"');
 	if (escapeAllUnicode)
  	{
- 		ret.append(UTF8::escape(value.begin(), value.end()), true);
+ 		ret.append(UTF8::escape(value.begin(), value.end(), true));
  	}
  	else
  	{
