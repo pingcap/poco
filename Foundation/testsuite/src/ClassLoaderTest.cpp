@@ -9,8 +9,8 @@
 
 
 #include "ClassLoaderTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/ClassLoader.h"
 #include "Poco/Manifest.h"
 #include "Poco/Exception.h"

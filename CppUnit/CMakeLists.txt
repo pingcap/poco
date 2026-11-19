@@ -22,9 +22,17 @@ target_include_directories( "${LIBNAME}"
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
+        # TestRunner.h needs Poco/Exception.h visible (consumed by the
+        # CppUnitMain / CppUnitPocoExceptionText macros at the consumer's
+        # call site). Pull Foundation's include dirs in without linking it:
+        # libPocoCppUnit itself never references Poco::Exception symbols.
+        $<TARGET_PROPERTY:PocoFoundation,INTERFACE_INCLUDE_DIRECTORIES>
     PRIVATE
     	${CMAKE_CURRENT_SOURCE_DIR}/src
     )
+
+# The upstream CppUnit uses C++17 ([[nodiscard]], std::is_arithmetic_v).
+target_compile_features("${LIBNAME}" PUBLIC cxx_std_17)
 target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
 
 POCO_INSTALL("${LIBNAME}")

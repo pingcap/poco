@@ -3,19 +3,19 @@
 //
 
 
-#ifndef Poco_CppUnit_Orthodox_INCLUDED
-#define Poco_CppUnit_Orthodox_INCLUDED
+#ifndef CppUnit_Orthodox_INCLUDED
+#define CppUnit_Orthodox_INCLUDED
 
 
-#include "Poco/CppUnit/CppUnit.h"
-#include "Poco/CppUnit/TestCase.h"
+#include "CppUnit/CppUnit.h"
+#include "CppUnit/TestCase.h"
 
 
 namespace CppUnit {
 
 
 /*
- * Orthodox performs a simple set of tests on an arbitrary
+ * Orthodox performs a simple set of tests on an arbitary
  * class to make sure that it supports at least the
  * following operations:
  *
@@ -54,8 +54,8 @@ public:
 	}
 
 protected:
-    ClassUnderTest call(ClassUnderTest object);
-    void runTest ();
+	ClassUnderTest call(ClassUnderTest object);
+	void runTest () override;
 };
 
 
@@ -63,29 +63,29 @@ protected:
 template <class ClassUnderTest>
 void Orthodox<ClassUnderTest>::runTest()
 {
-    // make sure we have a default constructor
-    ClassUnderTest   a, b, c;
+	// make sure we have a default constructor
+	ClassUnderTest   a, b, c;
 
-    // make sure we have an equality operator
-    assert (a == b);
+	// make sure we have an equality operator
+	assert (a == b);
 
-    // check the inverse
-    b.operator= (a.operator! ());
-    assert (a != b);
+	// check the inverse
+	b.operator= (a.operator! ());
+	assert (a != b);
 
-    // double inversion
-    b = !!a;
-    assert (a == b);
+	// double inversion
+	b = !!a;
+	assert (a == b);
 
-    // invert again
-    b = !a;
+	// invert again
+	b = !a;
 
-    // check calls
-    c = a;
-    assert (c == call (a));
+	// check calls
+	c = a;
+	assert (c == call (a));
 
-    c = b;
-    assert (c == call (b));
+	c = b;
+	assert (c == call (b));
 }
 
 
@@ -93,11 +93,11 @@ void Orthodox<ClassUnderTest>::runTest()
 template <class ClassUnderTest>
 ClassUnderTest Orthodox<ClassUnderTest>::call(ClassUnderTest object)
 {
-    return object;
+	return object;
 }
 
 
 } // namespace CppUnit
 
 
-#endif // Poco_CppUnit_Orthodox_INCLUDED
+#endif // CppUnit_Orthodox_INCLUDED

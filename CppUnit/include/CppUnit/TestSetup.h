@@ -3,13 +3,13 @@
 //
 
 
-#ifndef Poco_CppUnit_TestSetup_INCLUDED
-#define Poco_CppUnit_TestSetup_INCLUDED
+#ifndef CppUnit_TestSetup_INCLUDED
+#define CppUnit_TestSetup_INCLUDED
 
 
-#include "Poco/CppUnit/CppUnit.h"
-#include "Poco/CppUnit/Guards.h"
-#include "Poco/CppUnit/TestDecorator.h"
+#include "CppUnit/CppUnit.h"
+#include "CppUnit/Guards.h"
+#include "CppUnit/TestDecorator.h"
 
 
 namespace CppUnit {
@@ -27,14 +27,14 @@ public:
 	TestSetup(Test* test): TestDecorator(test)
 	{
 	}
-	
+
 	void run(TestResult* result);
 
 protected:
 	void setUp()
 	{
 	}
-	
+
 	void tearDown()
 	{
 	}
@@ -52,4 +52,4 @@ inline void TestSetup::run(TestResult* result)
 } // namespace CppUnit
 
 
-#endif // Poco_CppUnit_TestSetup_INCLUDED
+#endif // CppUnit_TestSetup_INCLUDED

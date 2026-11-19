@@ -9,8 +9,8 @@
 
 
 #include "ActiveDispatcherTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/ActiveDispatcher.h"
 #include "Poco/ActiveMethod.h"
 #include "Poco/Thread.h"

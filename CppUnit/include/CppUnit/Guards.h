@@ -3,8 +3,8 @@
 //
 
 
-#ifndef Poco_CppUnit_Guards_INCLUDED
-#define Poco_CppUnit_Guards_INCLUDED
+#ifndef CppUnit_Guards_INCLUDED
+#define CppUnit_Guards_INCLUDED
 
 
 // Prevent copy construction and assignment for a class
@@ -14,4 +14,4 @@ private: \
 	className& operator = (const className& other);
 
 
-#endif // Poco_CppUnit_Guards_INCLUDED
+#endif // CppUnit_Guards_INCLUDED

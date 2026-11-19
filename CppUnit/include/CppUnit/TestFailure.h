@@ -3,13 +3,13 @@
 //
 
 
-#ifndef Poco_CppUnit_TestFailure_INCLUDED
-#define Poco_CppUnit_TestFailure_INCLUDED
+#ifndef CppUnit_TestFailure_INCLUDED
+#define CppUnit_TestFailure_INCLUDED
 
 
-#include "Poco/CppUnit/CppUnit.h"
-#include "Poco/CppUnit/CppUnitException.h"
-#include "Poco/CppUnit/Guards.h"
+#include "CppUnit/CppUnit.h"
+#include "CppUnit/CppUnitException.h"
+#include "CppUnit/Guards.h"
 
 
 namespace CppUnit {
@@ -39,9 +39,9 @@ public:
 	TestFailure(Test* failedTest, CppUnitException* thrownException);
 	~TestFailure();
 
-	Test* failedTest();
-	CppUnitException* thrownException();
-	std::string toString();
+	[[nodiscard]] Test* failedTest();
+	[[nodiscard]] CppUnitException* thrownException();
+	[[nodiscard]] std::string toString();
 
 protected:
 	Test* _failedTest;
@@ -79,6 +79,6 @@ inline CppUnitException* TestFailure::thrownException()
 } // namespace CppUnit
 
 
-#endif // Poco_CppUnit_TestFailure_INCLUDED
+#endif // CppUnit_TestFailure_INCLUDED
 
 

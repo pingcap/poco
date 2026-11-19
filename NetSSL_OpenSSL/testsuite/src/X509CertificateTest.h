@@ -16,7 +16,7 @@
 #define X509CertificateTest_INCLUDED
 
 
-#include "Poco/CppUnit/TestCase.h"
+#include "CppUnit/TestCase.h"
 
 
 class X509CertificateTest: public CppUnit::TestCase

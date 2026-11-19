@@ -13,7 +13,7 @@
 #define BLAKE2EngineTest_INCLUDED
 
 #include "Poco/Foundation.h"
-#include "Poco/CppUnit/TestCase.h"
+#include "CppUnit/TestCase.h"
 
 class BLAKE2EngineTest: public CppUnit::TestCase
 {

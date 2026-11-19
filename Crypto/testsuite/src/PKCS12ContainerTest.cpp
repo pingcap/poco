@@ -9,8 +9,8 @@
 
 
 #include "PKCS12ContainerTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/Crypto/EVPPKey.h"
 #include "Poco/Environment.h"
 #include "Poco/Path.h"

@@ -9,8 +9,8 @@
 
 
 #include "LineEndingConverterTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/LineEndingConverter.h"
 #include "Poco/StreamCopier.h"
 #include <sstream>

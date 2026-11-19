@@ -9,8 +9,8 @@
 
 
 #include "SocketStreamTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "EchoServer.h"
 #include "Poco/Net/SocketStream.h"
 #include "Poco/Net/StreamSocket.h"

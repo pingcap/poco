@@ -10,9 +10,10 @@
 //
 
 
-#include "Poco/CppUnit/TestRunner.h"
+#include "CppUnit/TestRunner.h"
 #include "NetSSLTestSuite.h"
 #include "Poco/Path.h"
+#include "Poco/Net/NetSSL.h"
 #include "Poco/Util/Application.h"
 #include <iostream>
 
@@ -56,7 +57,9 @@ protected:
 		configPath.makeDirectory();
 		configPath.pushDirectory("NetSSL_OpenSSL");
 		configPath.pushDirectory("testsuite");
-		configPath.setFileName("TestSuite.xml");
+		// This fork builds Util without XMLConfiguration, so the test
+		// configuration is JSON.
+		configPath.setFileName("TestSuite.json");
 
 		loadConfiguration(configPath.toString());
 #else

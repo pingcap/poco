@@ -15,7 +15,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
-#include "Poco/CppUnit/TestCase.h"
+#include "CppUnit/TestCase.h"
 
 
 class DigestEngineTest: public CppUnit::TestCase

@@ -3,9 +3,8 @@
 //
 
 
-#ifndef Poco_CppUnit__CppUnitINCLUDED
-#define Poco_CppUnit__CppUnitINCLUDED
-
+#ifndef CppUnit_CppUnit_INCLUDED
+#define CppUnit_CppUnit_INCLUDED
 
 //
 // Ensure that POCO_DLL is default unless POCO_STATIC is defined
@@ -19,9 +18,9 @@
 
 //
 // The following block is the standard way of creating macros which make exporting
-// from a DLL simpler. All files within this DLL are compiled with the Poco_CppUnitEXPORTS
-// symbol defined on the command line. this symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file see
+// from a DLL simpler. All files within this DLL are compiled with the CppUnit_EXPORTS
+// symbol defined on the command line. This symbol should not be defined on any project
+// that uses this DLL. This way any other project whose source files include this file sees
 // CppUnit_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
@@ -35,16 +34,14 @@
 
 
 #if !defined(CppUnit_API)
-	#if defined (__GNUC__) && (__GNUC__ >= 4)
+	#if defined (__GNUC__)
 		#define CppUnit_API __attribute__ ((visibility ("default")))
 	#else
 		#define CppUnit_API
 	#endif
 #endif
 
-//
-// Automatically link CppUnit library.
-//
+
 #if defined(_MSC_VER)
 	#if defined(POCO_DLL)
 		#if defined(_DEBUG)
@@ -65,9 +62,14 @@
 			#define POCO_LIB_SUFFIX "mt.lib"
 		#endif
 	#endif
+#endif
 
-	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(CppUnit_EXPORTS)
-		#pragma comment(lib, "PocoCppUnit" POCO_LIB_SUFFIX)
+//
+// Automatically link CppUnit library.
+//
+#if defined(_MSC_VER) && !defined(POCO_NO_AUTOMATIC_LIBS)
+	#if !defined(CppUnit_EXPORTS)
+		#pragma comment(lib, "CppUnit" POCO_LIB_SUFFIX)
 	#endif
 #endif
 
@@ -84,4 +86,4 @@
 #endif
 
 
-#endif // Poco_CppUnit__CppUnitINCLUDED
+#endif // CppUnit_CppUnit_INCLUDED

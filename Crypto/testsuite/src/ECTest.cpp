@@ -10,8 +10,8 @@
 
 
 #include "ECTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/Crypto/ECKey.h"
 #include "Poco/Crypto/ECDSADigestEngine.h"
 #include <openssl/pem.h>

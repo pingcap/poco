@@ -9,8 +9,8 @@
 
 
 #include "TimedNotificationQueueTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/TimedNotificationQueue.h"
 #include "Poco/Notification.h"
 #include "Poco/Timestamp.h"

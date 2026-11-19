@@ -9,8 +9,8 @@
 
 
 #include "TuplesTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/Tuple.h"
 #include "Poco/Void.h"
 #include "Poco/Nullable.h"

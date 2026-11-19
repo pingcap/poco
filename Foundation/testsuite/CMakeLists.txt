@@ -48,6 +48,9 @@ endif()
 set_target_properties( TestApp PROPERTIES DEBUG_POSTFIX "") # don't use DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
 set_target_properties( TestApp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} )
 target_link_libraries( TestApp PocoFoundation)
+# The ProcessTest has to find TestApp in the working directory.
+add_dependencies( ${TESTUNIT} TestApp )
+set_property(TEST ${LIBNAME} APPEND PROPERTY ENVIRONMENT "PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}:$ENV{PATH}")
 
 if(NOT POCO_STATIC)
 # TestLibrary
@@ -57,5 +60,8 @@ set_target_properties( TestLibrary PROPERTIES PREFIX "" DEBUG_POSTFIX "") # don'
 set_target_properties( TestLibrary PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} )
 target_link_libraries( TestLibrary PocoFoundation)
 
+# The SharedLibraryTest and ClassLoaderTest load TestLibrary from the working directory.
+add_dependencies( ${TESTUNIT} TestLibrary )
+set_property(TEST ${LIBNAME} APPEND PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 endif()
 

@@ -3,7 +3,7 @@
 //
 
 
-#include "Poco/CppUnit/TestDecorator.h"
+#include "CppUnit/TestDecorator.h"
 
 
 namespace CppUnit {
@@ -15,24 +15,22 @@ TestDecorator::TestDecorator(Test* test)
 }
 
 
-TestDecorator::~TestDecorator()
-{
-}
+TestDecorator::~TestDecorator() = default;
 
 
-int TestDecorator::countTestCases()
+int TestDecorator::countTestCases() const
 {
 	return _test->countTestCases();
 }
 
 
-void TestDecorator::run(TestResult* result)
+void TestDecorator::run(TestResult* result, const Test::Callback& callback)
 {
 	_test->run(result);
 }
 
 
-std::string TestDecorator::toString()
+std::string TestDecorator::toString() const
 {
 	return _test->toString();
 }

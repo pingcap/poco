@@ -9,8 +9,8 @@
 
 
 #include "JSONTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/Path.h"
 #include "Poco/Environment.h"
 #include "Poco/File.h"
@@ -1940,7 +1940,7 @@ void JSONTest::testNonEscapeUnicode()
 	ss.str(""); object->stringify(ss);
 	assert (ss.str() == "{\"name\":\"g\xC3\xBCnter\"}");
 
-	poco::JSON::Object obj1;
+	Poco::JSON::Object obj1;
 	std::string shortEscapeStr("String with \t");
 	std::string longEscapeStr("String with \a and \v plus \t for good measure");
 	obj1.set("shortEscape", shortEscapeStr);

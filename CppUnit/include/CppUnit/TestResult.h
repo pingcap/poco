@@ -3,13 +3,13 @@
 //
 
 
-#ifndef Poco_CppUnit_TestResult_INCLUDED
-#define Poco_CppUnit_TestResult_INCLUDED
+#ifndef CppUnit_TestResult_INCLUDED
+#define CppUnit_TestResult_INCLUDED
 
 
-#include "Poco/CppUnit/CppUnit.h"
-#include "Poco/CppUnit/Guards.h"
-#include "Poco/CppUnit/TestFailure.h"
+#include "CppUnit/CppUnit.h"
+#include "CppUnit/Guards.h"
+#include "CppUnit/TestFailure.h"
 #include <vector>
 
 
@@ -53,9 +53,9 @@ public:
 	virtual void endTest(Test* test);
 	virtual int runTests();
 	virtual int testErrors();
-	virtual int testFailures();
-	virtual bool wasSuccessful();
-	virtual bool shouldStop();
+	[[nodiscard]] virtual int testFailures();
+	[[nodiscard]] virtual bool wasSuccessful();
+	[[nodiscard]] virtual bool shouldStop();
 	virtual void stop();
 
 	virtual std::vector<TestFailure*>& errors();
@@ -64,18 +64,14 @@ public:
 	class SynchronizationObject
 	{
 	public:
-		SynchronizationObject()
-		{
-		}
-		
-		virtual ~SynchronizationObject()
-		{
-		}
+		SynchronizationObject() = default;
+
+		virtual ~SynchronizationObject() = default;
 
 		virtual void lock()
 		{
 		}
-		
+
 		virtual void unlock()
 		{
 		}
@@ -96,6 +92,8 @@ public:
 			m_syncObject->unlock();
 		}
 	};
+
+	[[nodiscard]] static std::string demangle(const char* name);
 
 protected:
 	virtual void setSynchronizationObject(SynchronizationObject* syncObject);
@@ -136,7 +134,7 @@ inline void TestResult::addFailure(Test* test, CppUnitException* e)
 
 
 // Informs the result that a test will be started.
-inline void TestResult::startTest(Test* test)
+inline void TestResult::startTest(Test*)
 {
 	ExclusiveZone zone(_syncObject);
 	_runTests++;
@@ -144,7 +142,7 @@ inline void TestResult::startTest(Test* test)
 
 
 // Informs the result that a test was completed.
-inline void TestResult::endTest(Test* test)
+inline void TestResult::endTest(Test*)
 {
 	ExclusiveZone zone(_syncObject);
 }
@@ -226,4 +224,4 @@ inline void TestResult::setSynchronizationObject(SynchronizationObject* syncObje
 } // namespace CppUnit
 
 
-#endif // Poco_CppUnit_TestResult_INCLUDED
+#endif // CppUnit_TestResult_INCLUDED

@@ -9,8 +9,8 @@
 
 
 #include "ThreadLocalTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/ThreadLocal.h"
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"

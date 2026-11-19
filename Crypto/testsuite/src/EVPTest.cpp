@@ -14,8 +14,8 @@
 #include "Poco/Crypto/EVPPKey.h"
 #include "Poco/TemporaryFile.h"
 #include "Poco/StreamCopier.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include <sstream>
 #include <fstream>
 #include <iostream>

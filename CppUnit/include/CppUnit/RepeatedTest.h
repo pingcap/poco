@@ -3,13 +3,13 @@
 //
 
 
-#ifndef Poco_CppUnit_RepeatedTest_INCLUDED
-#define Poco_CppUnit_RepeatedTest_INCLUDED
+#ifndef CppUnit_RepeatedTest_INCLUDED
+#define CppUnit_RepeatedTest_INCLUDED
 
 
-#include "Poco/CppUnit/CppUnit.h"
-#include "Poco/CppUnit/Guards.h"
-#include "Poco/CppUnit/TestDecorator.h"
+#include "CppUnit/CppUnit.h"
+#include "CppUnit/Guards.h"
+#include "CppUnit/TestDecorator.h"
 #include "CppUnit/TestResult.h"
 
 
@@ -17,7 +17,6 @@ namespace CppUnit {
 
 
 class Test;
-
 
 /*
  * A decorator that runs a test repeatedly.
@@ -33,9 +32,9 @@ public:
 	{
 	}
 
-	int countTestCases();
-	std::string toString();
-	void run(TestResult *result);
+	[[nodiscard]] int countTestCases();
+	[[nodiscard]] std::string toString();
+	void run(TestResult* result, const Test::Callback& callback = nullptr) override;
 
 private:
 	const int _timesRepeat;
@@ -43,7 +42,7 @@ private:
 
 
 // Counts the number of test cases that will be run by this test.
-inline int RepeatedTest::countTestCases ()
+inline int RepeatedTest::countTestCases()
 {
 	return TestDecorator::countTestCases() * _timesRepeat;
 }
@@ -57,7 +56,7 @@ inline std::string RepeatedTest::toString()
 
 
 // Runs a repeated test
-inline void RepeatedTest::run(TestResult *result)
+inline void RepeatedTest::run(TestResult *result, const Test::Callback& callback)
 {
 	for (int n = 0; n < _timesRepeat; n++)
 	{
@@ -72,4 +71,4 @@ inline void RepeatedTest::run(TestResult *result)
 } // namespace CppUnit
 
 
-#endif // Poco_CppUnit_RepeatedTest_INCLUDED
+#endif // CppUnit_RepeatedTest_INCLUDED

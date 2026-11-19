@@ -9,8 +9,8 @@
 
 
 #include "ConfigurationMapperTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/Util/ConfigurationMapper.h"
 #include "Poco/Util/MapConfiguration.h"
 #include "Poco/AutoPtr.h"

@@ -10,8 +10,8 @@
 
 #include "PriorityEventTest.h"
 #include "DummyDelegate.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/PriorityDelegate.h"
 #include "Poco/PriorityExpire.h"
 #include "Poco/Thread.h"

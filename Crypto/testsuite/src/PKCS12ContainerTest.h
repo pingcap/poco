@@ -15,7 +15,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
-#include "Poco/CppUnit/TestCase.h"
+#include "CppUnit/TestCase.h"
 #include "Poco/Crypto/PKCS12Container.h"
 #include "Poco/Crypto/X509Certificate.h"
 

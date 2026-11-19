@@ -3,11 +3,11 @@
 //
 
 
-#ifndef Poco_CppUnit_CppUnitException_INCLUDED
-#define Poco_CppUnit_CppUnitException_INCLUDED
+#ifndef CppUnit_CppUnitException_INCLUDED
+#define CppUnit_CppUnitException_INCLUDED
 
 
-#include "Poco/CppUnit/CppUnit.h"
+#include "CppUnit/CppUnit.h"
 #include <exception>
 #include <string>
 
@@ -21,31 +21,31 @@ class CppUnit_API CppUnitException: public std::exception
 {
 public:
 	CppUnitException(const std::string& message = "",
-	                 long lineNumber = CPPUNIT_UNKNOWNLINENUMBER,
-	                 const std::string& fileName = CPPUNIT_UNKNOWNFILENAME);
+					 long lineNumber = CPPUNIT_UNKNOWNLINENUMBER,
+					 const std::string& fileName = CPPUNIT_UNKNOWNFILENAME);
 	CppUnitException(const std::string& message,
-	                 long lineNumber,
-	                 long data1lineNumber,
-	                 const std::string& fileName);
+					 long lineNumber,
+					 long data1lineNumber,
+					 const std::string& fileName);
 	CppUnitException(const std::string& message,
-	                 long lineNumber,
-	                 long data1lineNumber,
-	                 long data2lineNumber,
-	                 const std::string& fileName);
+					 long lineNumber,
+					 long data1lineNumber,
+					 long data2lineNumber,
+					 const std::string& fileName);
 	CppUnitException(const CppUnitException& other);
-	virtual ~CppUnitException() throw();
+	~CppUnitException() noexcept override;
 
 	CppUnitException& operator = (const CppUnitException& other);
 
-	const char* what() const throw ();
+	[[nodiscard]] const char* what() const noexcept override;
 
-	long lineNumber() const;
-	long data1LineNumber() const;
-	long data2LineNumber() const;
-	const std::string& fileName() const;
+	[[nodiscard]] long lineNumber() const;
+	[[nodiscard]] long data1LineNumber() const;
+	[[nodiscard]] long data2LineNumber() const;
+	[[nodiscard]] const std::string& fileName() const;
 
 	static const std::string CPPUNIT_UNKNOWNFILENAME;
-	static const int CPPUNIT_UNKNOWNLINENUMBER;
+	static constexpr int CPPUNIT_UNKNOWNLINENUMBER = -1;
 
 private:
 	std::string _message;
@@ -58,11 +58,11 @@ private:
 
 inline CppUnitException::CppUnitException(const CppUnitException& other): exception (other)
 {
-    _message         = other._message;
-    _lineNumber      = other._lineNumber;
-    _data1lineNumber = other._data1lineNumber;
-    _data2lineNumber = other._data2lineNumber;
-    _fileName        = other._fileName;
+	_message         = other._message;
+	_lineNumber      = other._lineNumber;
+	_data1lineNumber = other._data1lineNumber;
+	_data2lineNumber = other._data2lineNumber;
+	_fileName        = other._fileName;
 }
 
 
@@ -81,7 +81,7 @@ inline CppUnitException::CppUnitException (const std::string& message, long line
 }
 
 
-inline CppUnitException::~CppUnitException () throw()
+inline CppUnitException::~CppUnitException () noexcept
 {
 }
 
@@ -90,19 +90,19 @@ inline CppUnitException& CppUnitException::operator = (const CppUnitException& o
 {
 	exception::operator= (other);
 
-    if (&other != this)
-    {
-        _message    = other._message;
-        _lineNumber = other._lineNumber;
-        _data1lineNumber = other._data1lineNumber;
-        _data2lineNumber = other._data2lineNumber;
-        _fileName   = other._fileName;
-    }
-    return *this;
+	if (&other != this)
+	{
+		_message    = other._message;
+		_lineNumber = other._lineNumber;
+		_data1lineNumber = other._data1lineNumber;
+		_data2lineNumber = other._data2lineNumber;
+		_fileName   = other._fileName;
+	}
+	return *this;
 }
 
 
-inline const char* CppUnitException::what() const throw ()
+inline const char* CppUnitException::what() const noexcept
 {
 	return _message.c_str();
 }
@@ -136,4 +136,4 @@ inline const std::string& CppUnitException::fileName() const
 } // namespace CppUnit
 
 
-#endif // Poco_CppUnit_CppUnitException_INCLUDED
+#endif // CppUnit_CppUnitException_INCLUDED
