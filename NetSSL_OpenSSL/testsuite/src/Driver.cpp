@@ -10,9 +10,10 @@
 //
 
 
-#include "Poco/CppUnit/TestRunner.h"
+#include "CppUnit/TestRunner.h"
 #include "NetSSLTestSuite.h"
 #include "Poco/Path.h"
+#include "Poco/Net/NetSSL.h"
 #include "Poco/Util/Application.h"
 #include <iostream>
 
