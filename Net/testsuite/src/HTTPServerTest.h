@@ -40,6 +40,12 @@ public:
 	void testRedirectLineBreak();
 	void testSendLineBreak();
 	void testEchoDecodedLineBreak();
+	void testUnreadRequestBody();
+	void testUnreadChunkedRequestBody();
+	void testLargeUnreadRequestBody();
+	void testResponseBeforeUnreadRequestBody();
+	void testNonBlockingHandlerClosesConnection();
+	void testHandlerNonBlockingReadThenBlocking();
 
 	void setUp();
 	void tearDown();
