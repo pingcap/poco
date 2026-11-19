@@ -1,0 +1,362 @@
+//
+// TestCase.h
+//
+
+
+#ifndef CppUnit_TestCase_INCLUDED
+#define CppUnit_TestCase_INCLUDED
+
+
+#include "CppUnit/CppUnit.h"
+#include "CppUnit/Guards.h"
+#include "CppUnit/Test.h"
+#include "CppUnit/TestResult.h"
+#include "CppUnit/CppUnitException.h"
+#include <string>
+#include <vector>
+#include <typeinfo>
+#include <chrono>
+#include <thread>
+
+
+namespace CppUnit {
+
+
+template <typename Func>
+bool waitForCondition(Func condition, long timeoutMs, long pollIntervalMs = 100)
+	/// Waits for a condition to become true, with timeout.
+	///
+	/// This helper function is useful for testing asynchronous operations
+	/// or time-based expiration without using fixed Thread::sleep() calls.
+	///
+	/// The condition parameter is a callable that returns bool (e.g., a lambda).
+	/// The function polls the condition at regular intervals until it returns
+	/// true or the timeout expires.
+	///
+	/// Returns true if the condition was met within the timeout,
+	/// false if the timeout occurred.
+{
+	auto start = std::chrono::steady_clock::now();
+	auto timeout = std::chrono::milliseconds(timeoutMs);
+	auto pollInterval = std::chrono::milliseconds(pollIntervalMs);
+
+	while (std::chrono::steady_clock::now() - start < timeout)
+	{
+		if (condition())
+			return true;
+		std::this_thread::sleep_for(pollInterval);
+	}
+	return condition(); // Final check
+}
+
+
+class TestResult;
+
+
+/*
+ * A test case defines the fixture to run multiple tests. To define a test case
+ * 1) implement a subclass of TestCase
+ * 2) define instance variables that store the state of the fixture
+ * 3) initialize the fixture state by overriding setUp
+ * 4) clean-up after a test by overriding tearDown.
+ *
+ * Each test runs in its own fixture so there
+ * can be no side effects among test runs.
+ * Here is an example:
+ *
+ * class MathTest : public TestCase {
+ *     protected: int m_value1;
+ *     protected: int m_value2;
+ *
+ *     public: MathTest (std::string name)
+ *                 : TestCase (name) {
+ *     }
+ *
+ *     protected: void setUp () {
+ *         m_value1 = 2;
+ *         m_value2 = 3;
+ *     }
+ * }
+ *
+ *
+ * For each test implement a method which interacts
+ * with the fixture. Verify the expected results with assertions specified
+ * by calling assert on the expression you want to test:
+ *
+ *    protected: void testAdd () {
+ *        int result = value1 + value2;
+ *        assert (result == 5);
+ *    }
+ *
+ * Once the methods are defined you can run them. To do this, use
+ * a TestCaller.
+ *
+ * Test *test = new TestCaller<MathTest>("testAdd", MathTest::testAdd);
+ * test->run ();
+ *
+ *
+ * The tests to be run can be collected into a TestSuite. CppUnit provides
+ * different test runners which can run a test suite and collect the results.
+ * The test runners expect a static method suite as the entry
+ * point to get a test to run.
+ *
+ * public: static MathTest::suite () {
+ *      TestSuite *suiteOfTests = new TestSuite;
+ *      suiteOfTests->addTest(new TestCaller<MathTest>("testAdd", testAdd));
+ *      suiteOfTests->addTest(new TestCaller<MathTest>("testDivideByZero", testDivideByZero));
+ *      return suiteOfTests;
+ *  }
+ *
+ * Note that the caller of suite assumes lifetime control
+ * for the returned suite.
+ *
+ * see TestResult, TestSuite and TestCaller
+ *
+ */
+class CppUnit_API TestCase: public Test
+{
+	REFERENCEOBJECT (TestCase)
+
+public:
+	TestCase(const std::string& name, Test::Type testType = Test::Normal);
+	~TestCase() override;
+
+	void run(TestResult* result, const Test::Callback& callback = nullptr) override;
+		/// Runs setUp(), runTest() and tearDown() and records an exception
+		/// thrown by any of them in result: a CppUnitException as a failure,
+		/// any other exception as an error. The message of a record from
+		/// setUp() or tearDown() starts with "setUp(): " or "tearDown(): ".
+		///
+		/// runTest() is skipped if setUp() throws. tearDown() runs even if
+		/// setUp() or runTest() throws, so it must cope with a fixture that
+		/// setUp() did not complete.
+
+	virtual TestResult* run();
+	[[nodiscard]] int countTestCases() const override;
+	[[nodiscard]] std::string toString() const override;
+	[[nodiscard]] Test::Type getType() const override;
+	void setType(Test::Type testType);
+	[[nodiscard]] const std::string& name() const;
+
+	virtual void setUp();
+	virtual void setUp(const std::vector<std::string>& setup);
+	virtual void tearDown();
+
+protected:
+	virtual void runTest();
+	TestResult* defaultResult();
+
+	void assertImplementation(bool condition,
+							  const std::string& conditionExpression = "",
+							  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+							  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+
+	void loop1assertImplementation(bool condition,
+								   const std::string& conditionExpression = "",
+								   long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+								   long dataLineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+								   const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+
+	void loop2assertImplementation(bool condition,
+								   const std::string& conditionExpression = "",
+								   long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+								   long data1LineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+								   long data2LineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+								   const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+
+	template <typename T1, typename T2,
+		typename = std::enable_if_t<std::is_arithmetic_v<T1>, T1>,
+		typename = std::enable_if_t<std::is_arithmetic_v<T2>, T2>>
+	void assertEquals(T1 expected,
+					  T2 actual,
+					  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+					  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME)
+	{
+		// Use common_type to avoid sign-compare warnings when comparing mixed signed/unsigned types
+		using CommonType = std::common_type_t<T1, T2>;
+		if (static_cast<CommonType>(expected) != static_cast<CommonType>(actual))
+			assertImplementation(false, notEqualsMessage(expected, actual), lineNumber, fileName);
+	}
+
+	void assertEquals(double expected,
+					  double actual,
+					  double delta,
+					  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+					  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+
+	void assertEquals(const std::string& expected,
+					  const std::string& actual,
+					  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+					  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+
+	void assertEquals(const char* expected,
+					  const std::string& actual,
+					  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+					  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+
+	void assertMessageEquals(const std::string& expected,
+							 const std::string& actual,
+							 long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+							 const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+		/// Asserts that an exception message equals the expected text.
+		/// With POCO_ENABLE_TRACE, Poco::Exception appends a backtrace, which
+		/// starts with a newline, to the message; only that may follow the text.
+		/// A nested message that is empty apart from its own backtrace shows
+		/// up as ": " before that newline and is accepted as well.
+
+	void assertEquals(const void* expected,
+					  const void* actual,
+					  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+					  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+
+	template <typename T1, typename T2,
+		typename = std::enable_if_t<std::is_arithmetic_v<T1>, T1>,
+		typename = std::enable_if_t<std::is_arithmetic_v<T2>, T2>>
+	std::string notEqualsMessage(T1 expected, T2 actual)
+	{
+		return "expected: " + std::to_string(expected) + " but was: " + std::to_string(actual);
+	}
+
+	std::string notEqualsMessage(const void* expected, const void* actual);
+	std::string notEqualsMessage(const std::string& expected, const std::string& actual);
+
+	void assertNotNull(const void* pointer,
+					   const std::string& pointerExpression = "",
+					   long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+					   const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+
+	void assertNull(const void* pointer,
+					const std::string& pointerExpression = "",
+					long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+					const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+
+	[[noreturn]] void fail(const std::string& message = "",
+			  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+			  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+
+	void warn(const std::string& message = "",
+			  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+			  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+
+
+private:
+	const std::string _name;
+	Test::Type _type;
+};
+
+
+// Constructs a test case
+inline TestCase::TestCase(const std::string& name, Test::Type testType)
+	: _name (name)
+{
+	setType(testType);
+}
+
+
+// Destructs a test case
+inline TestCase::~TestCase() = default;
+
+
+// Returns a count of all the tests executed
+inline int TestCase::countTestCases() const
+{
+	return 1;
+}
+
+
+// Returns the name of the test case
+inline const std::string& TestCase::name() const
+{
+	return _name;
+}
+
+
+// A hook for fixture set up
+inline void TestCase::setUp()
+{
+}
+
+
+// A hook for fixture set up with command line arguments
+inline void TestCase::setUp(const std::vector<std::string>&)
+{
+}
+
+
+// A hook for fixture tear down
+inline void TestCase::tearDown()
+{
+}
+
+
+// Returns the name of the test case instance
+inline std::string TestCase::toString() const
+{
+	const std::type_info& thisClass = typeid(*this);
+	return TestResult::demangle(thisClass.name()) + "." + name();
+}
+
+
+// Returns the type of the test, see Test::Type
+inline Test::Type TestCase::getType() const
+{
+	return _type;
+}
+
+
+// Set the type of the test, see Test::Type
+inline void TestCase::setType(Test::Type testType)
+{
+	_type = testType;
+}
+
+
+// A set of macros which allow us to get the line number
+// and file name at the point of an error.
+// Just goes to show that preprocessors do have some
+// redeeming qualities.
+
+// for backward compatibility only
+// (may conflict with C assert, use at your own risk)
+#undef assert
+#define assert(condition) \
+	(this->assertImplementation((condition), (#condition), __LINE__, __FILE__))
+
+#define assertTrue(condition) \
+	(this->assertImplementation((condition), (#condition), __LINE__, __FILE__))
+
+#define assertFalse(condition) \
+	(this->assertImplementation(!(condition), (#condition), __LINE__, __FILE__))
+
+#define loop_1_assert(data1line, condition) \
+	(this->loop1assertImplementation((condition), (#condition), __LINE__, data1line, __FILE__))
+
+#define loop_2_assert(data1line, data2line, condition) \
+	(this->loop2assertImplementation((condition), (#condition), __LINE__, data1line, data2line, __FILE__))
+
+#define assertEqualDelta(expected, actual, delta) \
+	(this->assertEquals((expected), (actual), (delta), __LINE__, __FILE__))
+
+#define assertEqual(expected, actual) \
+	(this->assertEquals((expected), (actual), __LINE__, __FILE__))
+
+#define assertMessageEqual(expected, actual) \
+	(this->assertMessageEquals((expected), (actual), __LINE__, __FILE__))
+
+#define assertNullPtr(ptr) \
+	(this->assertNull((ptr), #ptr, __LINE__, __FILE__))
+
+#define assertNotNullPtr(ptr) \
+	(this->assertNotNull((ptr), #ptr, __LINE__, __FILE__))
+
+#define failmsg(msg) \
+	(this->fail(msg, __LINE__, __FILE__))
+
+#define warnmsg(msg) \
+	(this->warn(msg, __LINE__, __FILE__))
+
+
+} // namespace CppUnit
+
+
+#endif // CppUnit_TestCase_INCLUDED

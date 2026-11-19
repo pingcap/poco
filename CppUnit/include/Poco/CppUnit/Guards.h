@@ -1,17 +1,16 @@
 //
 // Guards.h
 //
+// Compatibility forwarder: the CppUnit headers moved to CppUnit/.
+// Kept so the existing test suites compile while their includes are migrated.
+//
 
 
 #ifndef Poco_CppUnit_Guards_INCLUDED
 #define Poco_CppUnit_Guards_INCLUDED
 
 
-// Prevent copy construction and assignment for a class
-#define REFERENCEOBJECT(className) \
-private: \
-	className(const className& other); \
-	className& operator = (const className& other);
+#include "CppUnit/Guards.h"
 
 
 #endif // Poco_CppUnit_Guards_INCLUDED
